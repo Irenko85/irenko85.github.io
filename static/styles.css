@@ -12,10 +12,10 @@ body {
 
 .presentation {
     text-align: justify;
-    font-size: 1rem;
+    font-size: 1.2rem;
     margin-top: 1rem;
-    padding-left: 25%;
-    padding-right: 25%;
+    padding-left: 50px;
+    padding-right: 50px;
 }
 
 .div {
@@ -37,7 +37,7 @@ body {
 
 .icons {
     margin-top: 1rem;
-    color: #1093ff;
+    color: #1092ff;
 }
 
 .links {
