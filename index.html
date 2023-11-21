@@ -4,38 +4,176 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nicolás I. Peña Henríquez</title>
+    <title>Irenko</title>
     <link rel="stylesheet" href="./static/styles.css">
     <link rel="icon" href="./static/img/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
 </head>
 
 <body>
-    <div class="div">
-        <h1 class="name">Nicolás I. Peña Henríquez</h1>
-        <p class="presentation">I am 22 years old and currently in my fourth year of the Computer Engineering program at
-            the University of Chile. I consider myself a responsible and competitive individual, eager to learn new
-            technologies and disciplines, as well as to collaborate in a team environment. My areas of interest include
-            web development, software development and game development.</p>
-        <div class="container">
-            <img id="mob" src="./static/img/pp2.png" alt="Mob" width="250px" height="250px">
-            <a href="http://github.com/Irenko85" class="links" target="_blank">
-                <i class="fa-brands fa-github icons"></i>
-                My GitHub
-            </a>
-            <a href="https://www.linkedin.com/in/nicol%C3%A1s-irenco-pe%C3%B1a-henr%C3%ADquez-a81980255/" class="links"
-                target="_blank">
-                <i class="fa-brands fa-linkedin icons"></i>
-                My LinkedIn
-            </a>
-            <a href="mailto:nicolas.pena.h@ug.uchile.cl" class="links" target="_blank">
-                <i class="fa-solid fa-envelope icons"></i>
-                nicolas.pena.h@ug.uchile.cl
-            </a>
-            <span>
-                <i class="fa-solid fa-phone icons"></i>
-                +56 9 7252 6526
-            </span>
+    <div class="container text-center border border-3 border-secondary rounded-4" id="presentation">
+        <div class="row my-5">
+            <div class="col-md-4 justify-content-center mt-3 d-none d-md-block d-md-flex align-items-center">
+                <img src="./static/img/pp2.png" alt="Mob" class="img-fluid rounded-5" width="200px">
+            </div>
+            <div class="col-md-8">
+                <div class="container px-5 py-3 mb-4 test">
+                    <h1 class="mt-3"><strong>Nicolás I. Peña Henríquez</strong></h1>
+                    <h4 style="color: #35a4ff;"><strong>Computer Science Student 💻</strong></h4>
+                </div>
+                <p class="px-2 mb-4">I'm 22 years old and currently in my 4th year of Computer Science at the
+                    University of Chile. I consider myself a responsible and competitive person, eager to learn new
+                    technologies and disciplines, as well as to collaborate in a team environment. My areas of interest
+                    include web development, software development and game development.</p>
+                <div class="container bg-light py-3 rounded-5 test">
+                    <a href="https://github.com/Irenko85" target="_blank" class="text-decoration-none text-white mx-1">
+                        <i class="fa-brands fa-github text-dark"></i>
+                        <span class="links">My GitHub</span>
+                    </a>
+                    <span class="text-secondary">|</span>
+                    <a href="https://github.com/Irenko85" target="_blank" class="text-decoration-none text-white mx-1">
+                        <i class="fa-brands fa-linkedin text-dark"></i>
+                        <span class="links">My Linkedin</span>
+                    </a>
+                    <span class="text-secondary">|</span>
+                    <a class="text-decoration-none text-white mx-1">
+                        <i class="fa-solid fa-envelope text-dark"></i>
+                        <span class="links">nicolas.pena.h@ug.uchile.cl</span>
+                    </a>
+                    <span class="text-secondary">|</span>
+                    <a class="text-decoration-none text-white mx-1">
+                        <i class="fa-solid fa-mobile-screen-button text-dark"></i>
+                        <span class="links">+56 9 7252 6526</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container border border-3 border-secondary rounded-4 my-5 pb-5" id="projects">
+        <h1 class="text-center my-4 bg-dark rounded-3 py-3"><strong>MY PERSONAL PROJECTS</strong></h1>
+        <div class="row align-items-center mb-4">
+            <div class="col-md-2 text-end d-none d-md-block">
+                <a href="https://github.com/Irenko85/wca-bot" target="_blank" class="blue text-decoration-none">
+                    <img src="./static/img/logo.jpg" alt="WCA Bot" width="125px"
+                        class="img-fluid rounded-4 img-link"></a>
+            </div>
+            <div class="col-md-10">
+                <h4><a href="https://github.com/Irenko85/wca-bot" target="_blank" class="blue text-decoration-none"><i
+                            class="fa-solid fa-link" style="font-size: 12px;"></i> WCA
+                        Notifier Discord Bot</a>
+                    <i class="devicon-python-plain text-light"></i>
+                    <i class="devicon-postgresql-plain text-light"></i>
+                </h4>
+                <p>Discord bot developed in Python and hosted on RailWay to notify when an official World Cube
+                    Association (WCA) competition is added in a given country. For the bot, I used the Discord.py
+                    library, web scraping, calls to unofficial WCA APIs and a PostgreSQL database. It also supports 3
+                    languages, English, Spanish and Portuguese.</p>
+            </div>
+        </div>
+        <div class="row align-items-center mb-4">
+            <div class="col-md-2 text-end d-none d-md-block">
+                <a href="https://github.com/Irenko85/todo-flask" target="_blank" class="blue text-decoration-none"><img
+                        src="./static/img/todo.png" alt="ToDo App" width="125px"
+                        class="img-fluid rounded-4 img-link"></a>
+            </div>
+            <div class="col-md-10">
+                <h4><a href="https://github.com/Irenko85/todo-flask" target="_blank"
+                        class="blue text-decoration-none"><i class="fa-solid fa-link" style="font-size: 12px;"></i> ToDo
+                        App</a>
+                    <i class="devicon-python-plain text-light"></i>
+                    <i class="devicon-flask-original text-light"></i>
+                    <i class="devicon-sqlite-plain text-light"></i>
+                </h4>
+                <p>
+                    Simple web application for creating a to-do list. Developed with Flask and using SQLite as the
+                    database.
+                </p>
+            </div>
+        </div>
+        <div class="row align-items-center mb-4">
+            <div class="col-md-2 text-end d-none d-md-block">
+                <a href="https://krizz1.itch.io/dimensional-drift" target="_blank"
+                    class="text-decoration-none blue"><img src="./static/img/dimensional-drift.png"
+                        alt="Dimensional Drift Game" width="125px" class="img-fluid rounded-4 img-link"></a>
+            </div>
+            <div class="col-md-10">
+                <h4><a href="https://krizz1.itch.io/dimensional-drift" target="_blank"
+                        class="text-decoration-none blue"><i class="fa-solid fa-link" style="font-size: 12px;"></i>
+                        Dimensional Drift</a>
+                    <i class="devicon-godot-plain text-light"></i>
+                </h4>
+                <p>
+                    2D platformer game developed by a group of three in Godot using the GDScript language. The game was
+                    a
+                    team project for the final assignment of the Video Game Development course at the University of
+                    Chile.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="container border border-3 border-secondary rounded-4 my-5" id="technologies">
+        <h1 class="text-center my-4 bg-dark rounded-3 py-3"><strong>TECHNOLOGIES</strong></h1>
+        <div class="container my-3 text-center">
+            <div class="row justify-content-center pt-3">
+                <div class="col-md-3 mb-3 col-3">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg"
+                        class="img-fluid mb-3" alt="Python" width="150px" />
+                </div>
+                <div class="col-md-3 mb-3 col-3">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/django/django-plain-wordmark.svg"
+                        class="img-fluid mb-3" alt="Django" width="150px" />
+                </div>
+                <div class="col-md-3 mb-3 col-3">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flask/flask-original-wordmark.svg"
+                        class="img-fluid mb-3" alt="Flask" width="150px" />
+                </div>
+                <div class="col-md-3 mb-3 col-3">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/godot/godot-original.svg"
+                        class="img-fluid mb-3" alt="Godot" width="150px" />
+                </div>
+                <div class="col-md-3 mb-3 col-3">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg"
+                        class="img-fluid mb-3" alt="HTML5" width="150px" />
+                </div>
+                <div class="col-md-3 mb-3 col-3">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg"
+                        class="img-fluid mb-3" alt="CSS3" width="150px" />
+                </div>
+                <div class="col-md-3 mb-3 col-3">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg"
+                        class="img-fluid mb-3" alt="JavaScript" width="150px" />
+                </div>
+                <div class="col-md-3 mb-3 col-3">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/c/c-original.svg"
+                        class="img-fluid mb-3" alt="C" width="150px" />
+                </div>
+                <div class="col-md-3 mb-3 col-3">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg"
+                        class="img-fluid mb-3" alt="C++" width="150px" />
+                </div>
+                <div class="col-md-3 mb-3 col-3">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg"
+                        class="img-fluid mb-3" alt="Git" width="150px" />
+                </div>
+                <div class="col-md-3 mb-3 col-3">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg"
+                        class="img-fluid mb-3" alt="PostgreSQL" width="150px" />
+                </div>
+                <div class="col-md-3 mb-3 col-3">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg"
+                        class="img-fluid mb-3" alt="MySQL" width="150px" />
+                </div>
+                <div class="col-md-3 mb-3 col-3">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/sqlite/sqlite-original.svg"
+                        class="img-fluid mb-3" alt="SQLite" width="150px" />
+                </div>
+            </div>
         </div>
     </div>
 </body>
