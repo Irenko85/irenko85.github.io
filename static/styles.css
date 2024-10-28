@@ -3,18 +3,18 @@ html {
 }
 
 body {
-    background-color: #121212 !important;
+    background-color: #121212f8 !important;
     color: rgb(231, 231, 231) !important;
     font-family: 'Rubik', 'Roboto', sans-serif !important;
 }
 
 .links {
     text-decoration: none;
-    color: black;
+    transition: 0.2s;
 }
 
 .links:hover {
-    color: #0063b4;
+    color: #bbbbbb;
 }
 
 #presentation {
@@ -27,6 +27,7 @@ body {
 
 .blue {
     color: #77c2ff !important;
+    transition: 0.2s;
 }
 
 .blue:hover {
@@ -54,6 +55,7 @@ h6 {
     text-decoration: none;
     font-weight: bold;
     color: #77c2ff;
+    transition: 0.2s;
 }
 
 .company:hover {
