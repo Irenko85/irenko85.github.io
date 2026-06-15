@@ -1,1155 +1,261 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<title>CÓDIGO ROJO — Ciberseguridad en Salud</title>
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg:#050d14;--panel:#0a1828;--panel2:#0d2035;
-    --red:#ff2233;--red-dim:#7a0010;
-    --cyan:#00e5ff;--cyan-dim:#004d5a;
-    --green:#00ff88;--green-dim:#003d22;
-    --yellow:#ffcc00;--orange:#ff8800;
-    --blue:#4488ff;--purple:#aa44ff;
-    --text:#c8e6f0;--muted:#4a7a90;--border:#1a3a50;
-  }
-  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-  body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;overflow-x:hidden;position:relative;-webkit-text-size-adjust:100%;}
-  body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,229,255,0.015) 2px,rgba(0,229,255,0.015) 4px);pointer-events:none;z-index:1000;}
-  .grid-bg{position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.04) 1px,transparent 1px);background-size:40px 40px;animation:gridMove 20s linear infinite;z-index:0;}
-  @keyframes gridMove{0%{background-position:0 0}100%{background-position:40px 40px}}
-  .container{position:relative;z-index:10;max-width:960px;margin:0 auto;padding:16px;min-height:100vh;display:flex;flex-direction:column;}
-
-  /* HEADER */
-  .header{text-align:center;padding:16px 0 10px;}
-  .header-label{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;color:var(--red);text-transform:uppercase;margin-bottom:8px;animation:blink 1.5s infinite;}
-  @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0.3}}
-  .header h1{font-family:'Orbitron',sans-serif;font-size:clamp(22px,5vw,40px);font-weight:900;color:var(--cyan);text-shadow:0 0 20px rgba(0,229,255,0.5);letter-spacing:2px;line-height:1.1;}
-  .header h1 span{color:var(--red);text-shadow:0 0 20px rgba(255,34,51,0.6);}
-  .header-sub{font-size:11px;color:var(--muted);letter-spacing:2px;margin-top:6px;font-family:'Share Tech Mono',monospace;}
-  .header-line{width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--red),transparent);margin-top:10px;opacity:0.5;}
-
-  /* STATUS BAR */
-  .status-bar{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;background:var(--panel);border:1px solid var(--border);border-radius:4px;margin:8px 0;font-family:'Share Tech Mono',monospace;font-size:12px;gap:6px;flex-wrap:wrap;}
-  .stat{display:flex;align-items:center;gap:6px;}
-  .stat-label{color:var(--muted);}
-  .stat-val{color:var(--cyan);font-weight:bold;}
-  .stat-val.green{color:var(--green);}
-  .lives{display:flex;gap:3px;}
-  .heart{font-size:13px;transition:all 0.3s;}
-  .heart.dead{opacity:0.15;filter:grayscale(1);}
-
-  /* PROGRESS */
-  .progress-wrap{background:var(--panel);border:1px solid var(--border);border-radius:2px;height:5px;margin-bottom:10px;overflow:hidden;}
-  .progress-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));border-radius:2px;transition:width 0.6s ease;box-shadow:0 0 8px var(--cyan);}
-
-  /* SCREENS */
-  .screen{display:none;flex-direction:column;flex:1;}
-  .screen.active{display:flex;}
-
-  /* INTRO */
-  .intro-card{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:22px 18px;text-align:center;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;position:relative;overflow:hidden;}
-  .intro-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--red),var(--cyan),var(--green));}
-  .big-icon{font-size:52px;animation:pulse 2s ease-in-out infinite;}
-  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-  .intro-title{font-family:'Orbitron',sans-serif;font-size:16px;color:var(--yellow);}
-  .intro-desc{color:var(--text);font-size:14px;line-height:1.6;max-width:520px;opacity:0.85;}
-  .intro-stats{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
-  .intro-stat{background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:8px 16px;text-align:center;}
-  .intro-stat-num{font-family:'Orbitron',sans-serif;font-size:24px;color:var(--cyan);}
-  .intro-stat-label{font-size:10px;color:var(--muted);margin-top:3px;}
-  .mode-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:9px;width:100%;max-width:680px;}
-  .mode-btn{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:13px 10px;cursor:pointer;text-align:center;color:var(--text);font-family:'Rajdhani',sans-serif;-webkit-appearance:none;appearance:none;touch-action:manipulation;}
-  .mode-btn:active{border-color:var(--cyan);background:rgba(0,229,255,0.1);transform:scale(0.97);}
-  .mode-btn .mode-icon{font-size:24px;margin-bottom:5px;}
-  .mode-btn .mode-name{font-family:'Orbitron',sans-serif;font-size:11px;color:var(--cyan);margin-bottom:3px;}
-  .mode-btn .mode-desc{font-size:10px;color:var(--muted);}
-
-  /* TEAM SETUP */
-  .team-setup-card{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:22px 18px;flex:1;display:flex;flex-direction:column;align-items:center;gap:18px;position:relative;overflow:hidden;}
-  .team-setup-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--purple));}
-  .team-setup-title{font-family:'Orbitron',sans-serif;font-size:16px;color:var(--yellow);text-align:center;}
-  .team-inputs{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:480px;}
-  .team-input-group{display:flex;flex-direction:column;gap:7px;}
-  .team-input-group label{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;}
-  .team-input-group label.team1-label{color:var(--blue);}
-  .team-input-group label.team2-label{color:var(--purple);}
-  .team-name-input{background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;width:100%;outline:none;-webkit-appearance:none;appearance:none;}
-  .team-name-input:focus{border-color:var(--cyan);}
-  .qs-select-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:2px;}
-  .qs-select{display:flex;gap:8px;}
-  .qs-btn{background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:8px 16px;color:var(--muted);font-family:'Orbitron',sans-serif;font-size:12px;cursor:pointer;touch-action:manipulation;-webkit-appearance:none;}
-  .qs-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,229,255,0.08);}
-  .start-team-btn{background:linear-gradient(135deg,#1a2a6c,#2a1a4c);border:1px solid var(--blue);border-radius:6px;color:#fff;font-family:'Orbitron',sans-serif;font-size:13px;padding:13px 28px;cursor:pointer;letter-spacing:2px;touch-action:manipulation;-webkit-appearance:none;}
-  .start-team-btn:active{background:var(--blue);}
-
-  /* TEAM TRANSITION */
-  .team-transition{position:fixed;inset:0;z-index:3500;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:28px;}
-  .team-transition.show{display:flex;}
-  .team-transition.team1-bg{background:radial-gradient(ellipse at 50% 50%,rgba(68,136,255,0.25) 0%,#050d14 70%);}
-  .team-transition.team2-bg{background:radial-gradient(ellipse at 50% 50%,rgba(170,68,255,0.25) 0%,#050d14 70%);}
-  .tt-label{font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:4px;color:var(--muted);}
-  .tt-team{font-family:'Orbitron',sans-serif;font-size:clamp(26px,8vw,52px);font-weight:900;line-height:1.1;}
-  .tt-team.t1{color:var(--blue);text-shadow:0 0 30px rgba(68,136,255,0.6);}
-  .tt-team.t2{color:var(--purple);text-shadow:0 0 30px rgba(170,68,255,0.6);}
-  .tt-sub{font-size:15px;color:var(--text);opacity:0.8;}
-  .tt-score-prev{font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--muted);background:var(--panel);border:1px solid var(--border);padding:9px 18px;border-radius:6px;}
-  .tt-btn{background:var(--panel2);border:1px solid var(--cyan);border-radius:6px;color:var(--cyan);font-family:'Orbitron',sans-serif;font-size:13px;padding:14px 32px;cursor:pointer;letter-spacing:2px;touch-action:manipulation;-webkit-appearance:none;min-height:48px;}
-  .tt-btn:active{background:var(--cyan);color:var(--bg);}
-
-  /* TEAM HUD */
-  .team-hud{display:none;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
-  .team-hud.show{display:grid;}
-  .team-hud-card{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:9px 12px;display:flex;justify-content:space-between;align-items:center;transition:all 0.3s;}
-  .team-hud-card.active-team.t1{border-color:var(--blue);border-width:2px;background:rgba(68,136,255,0.07);box-shadow:0 0 10px rgba(68,136,255,0.2);}
-  .team-hud-card.active-team.t2{border-color:var(--purple);border-width:2px;background:rgba(170,68,255,0.07);box-shadow:0 0 10px rgba(170,68,255,0.2);}
-  .th-name{font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;}
-  .th-name.t1{color:var(--blue);}
-  .th-name.t2{color:var(--purple);}
-  .th-score{font-family:'Orbitron',sans-serif;font-size:18px;color:var(--text);}
-  .th-detail{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);}
-  .th-turn-badge{font-size:10px;font-family:'Share Tech Mono',monospace;letter-spacing:1px;padding:2px 7px;border-radius:4px;}
-  .th-turn-badge.active{background:rgba(0,229,255,0.15);color:var(--cyan);border:1px solid rgba(0,229,255,0.3);}
-  .th-turn-badge.waiting{color:var(--muted);}
-
-  /* QUIZ */
-  .quiz-area{display:flex;flex-direction:column;gap:12px;flex:1;}
-  .question-card{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:18px;position:relative;overflow:hidden;}
-  .question-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;transform:scaleX(0);transform-origin:left;animation:slideIn 0.4s forwards;}
-  .question-card.normal-card::before{background:linear-gradient(90deg,var(--cyan),var(--red));}
-  .question-card.t1-card::before{background:linear-gradient(90deg,var(--blue),var(--cyan));}
-  .question-card.t2-card::before{background:linear-gradient(90deg,var(--purple),var(--blue));}
-  .question-card.vf-card::before{background:linear-gradient(90deg,var(--yellow),var(--orange));}
-  @keyframes slideIn{to{transform:scaleX(1)}}
-  .q-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;font-family:'Share Tech Mono',monospace;font-size:10px;}
-  .q-tag{background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.3);border-radius:4px;padding:3px 9px;color:var(--cyan);letter-spacing:1px;}
-  .q-tag.t1-tag{background:rgba(68,136,255,0.1);border-color:rgba(68,136,255,0.4);color:var(--blue);}
-  .q-tag.t2-tag{background:rgba(170,68,255,0.1);border-color:rgba(170,68,255,0.4);color:var(--purple);}
-  .q-tag.vf-tag{background:rgba(255,204,0,0.1);border-color:rgba(255,204,0,0.4);color:var(--yellow);}
-  .q-num{color:var(--muted);}
-  .q-text{font-size:clamp(14px,2.8vw,19px);font-weight:700;line-height:1.45;color:#e8f4ff;}
-
-  .timer-bar-wrap{background:var(--panel2);border-radius:2px;height:4px;margin-top:12px;overflow:hidden;}
-  .timer-bar{height:100%;border-radius:2px;transition:width 1s linear,background 1s;background:var(--cyan);}
-  .timer-bar.urgent{background:var(--red);animation:urgentPulse 0.5s infinite;}
-  @keyframes urgentPulse{0%,100%{opacity:1}50%{opacity:0.4}}
-
-  /* OPTIONS */
-  .options-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
-  @media(max-width:500px){.options-grid{grid-template-columns:1fr;}}
-  .vf-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:440px;margin:0 auto;width:100%;}
-
-  /* KEY FIX for iOS: no :hover transforms, use :active, explicit cursor, no transition on touch */
-  .opt-btn{
-    background:var(--panel2);border:1px solid var(--border);border-radius:8px;
-    padding:12px 13px;cursor:pointer;text-align:left;color:var(--text);
-    font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;
-    display:flex;align-items:flex-start;gap:9px;
-    -webkit-appearance:none;appearance:none;touch-action:manipulation;
-    min-height:48px;width:100%;
-  }
-  .opt-btn:active:not(:disabled){border-color:var(--cyan);background:rgba(0,229,255,0.08);}
-  .opt-btn:disabled{cursor:default;}
-  .opt-btn.correct{border-color:var(--green)!important;background:rgba(0,255,136,0.1)!important;box-shadow:0 0 12px rgba(0,255,136,0.2);}
-  .opt-btn.wrong{border-color:var(--red)!important;background:rgba(255,34,51,0.1)!important;}
-  .opt-letter{font-family:'Orbitron',sans-serif;font-size:10px;color:var(--muted);min-width:18px;padding-top:2px;flex-shrink:0;}
-  .opt-btn.correct .opt-letter{color:var(--green);}
-  .opt-btn.wrong .opt-letter{color:var(--red);}
-
-  .vf-btn{
-    background:var(--panel2);border:2px solid var(--border);border-radius:12px;
-    padding:20px 14px;cursor:pointer;text-align:center;color:var(--text);
-    font-family:'Orbitron',sans-serif;font-size:20px;font-weight:900;
-    display:flex;flex-direction:column;align-items:center;gap:7px;
-    -webkit-appearance:none;appearance:none;touch-action:manipulation;
-    min-height:80px;width:100%;
-  }
-  .vf-btn:active:not(:disabled){transform:scale(0.96);}
-  .vf-btn.vf-true:active:not(:disabled){border-color:var(--green);background:rgba(0,255,136,0.08);}
-  .vf-btn.vf-false:active:not(:disabled){border-color:var(--red);background:rgba(255,34,51,0.08);}
-  .vf-btn.correct{border-color:var(--green)!important;background:rgba(0,255,136,0.12)!important;}
-  .vf-btn.wrong{border-color:var(--red)!important;background:rgba(255,34,51,0.1)!important;}
-  .vf-btn:disabled{cursor:default;}
-  .vf-icon{font-size:28px;}
-  .vf-label{font-size:12px;letter-spacing:3px;}
-
-  /* EXPLANATION */
-  .explanation{background:rgba(0,229,255,0.05);border:1px solid rgba(0,229,255,0.2);border-left:3px solid var(--cyan);border-radius:6px;padding:12px 14px;font-size:13px;line-height:1.6;color:var(--text);display:none;}
-  .explanation.show{display:block;}
-  .explanation.wrong-exp{background:rgba(255,34,51,0.05);border-color:rgba(255,34,51,0.3);border-left-color:var(--red);}
-  .exp-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--cyan);margin-bottom:5px;}
-  .explanation.wrong-exp .exp-label{color:var(--red);}
-
-  .combo-display{font-family:'Orbitron',sans-serif;font-size:11px;color:var(--yellow);letter-spacing:2px;text-align:center;min-height:18px;}
-  .next-btn{
-    align-self:flex-end;background:linear-gradient(135deg,var(--cyan-dim),#003d4f);
-    border:1px solid var(--cyan);border-radius:6px;color:var(--cyan);
-    font-family:'Orbitron',sans-serif;font-size:12px;padding:12px 24px;
-    cursor:pointer;letter-spacing:2px;display:none;
-    -webkit-appearance:none;appearance:none;touch-action:manipulation;min-height:44px;
-  }
-  .next-btn.show{display:block;}
-  .next-btn:active{background:var(--cyan);color:var(--bg);}
-  .timer-num{font-family:'Orbitron',sans-serif;font-size:12px;transition:color 0.5s;}
-  .timer-num.urgent{color:var(--red);}
-
-  /* TOAST */
-  .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--panel);border:1px solid var(--green);border-radius:8px;padding:9px 20px;font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--green);z-index:6000;transition:transform 0.4s cubic-bezier(0.175,0.885,0.32,1.275);pointer-events:none;white-space:nowrap;}
-  .toast.show{transform:translateX(-50%) translateY(0);}
-  .toast.wrong-toast{border-color:var(--red);color:var(--red);}
-
-  /* RESULTS */
-  .results-card{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:24px;text-align:center;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;position:relative;overflow:hidden;}
-  .score-circle{width:110px;height:110px;border-radius:50%;border:3px solid var(--cyan);display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle,rgba(0,229,255,0.1),transparent);box-shadow:0 0 24px rgba(0,229,255,0.2);}
-  .score-num{font-family:'Orbitron',sans-serif;font-size:30px;font-weight:900;color:var(--cyan);}
-  .score-total{font-size:11px;color:var(--muted);}
-  .result-title{font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;}
-  .result-msg{font-size:14px;color:var(--text);max-width:460px;line-height:1.6;opacity:0.85;}
-  .breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;width:100%;max-width:360px;}
-  .break-item{background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:9px;text-align:center;}
-  .break-num{font-family:'Orbitron',sans-serif;font-size:20px;}
-  .break-label{font-size:10px;color:var(--muted);margin-top:2px;}
-  .btn-primary{background:linear-gradient(135deg,var(--red-dim),#5a0010);border:1px solid var(--red);border-radius:6px;color:#fff;font-family:'Orbitron',sans-serif;font-size:12px;padding:13px 26px;cursor:pointer;letter-spacing:2px;-webkit-appearance:none;appearance:none;touch-action:manipulation;min-height:44px;}
-  .btn-primary:active{background:var(--red);}
-  .btn-secondary{background:transparent;border:1px solid var(--muted);border-radius:6px;color:var(--muted);font-family:'Orbitron',sans-serif;font-size:12px;padding:13px 26px;cursor:pointer;letter-spacing:2px;-webkit-appearance:none;appearance:none;touch-action:manipulation;min-height:44px;}
-  .btn-secondary:active{border-color:var(--text);color:var(--text);}
-  .btn-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
-
-  /* TEAM RESULTS */
-  .team-results-card{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:24px;flex:1;display:flex;flex-direction:column;align-items:center;gap:18px;position:relative;overflow:hidden;}
-  .team-results-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--purple),var(--cyan));}
-  .tr-title{font-family:'Orbitron',sans-serif;font-size:clamp(15px,4vw,24px);font-weight:900;color:var(--yellow);text-align:center;letter-spacing:2px;}
-  .tr-teams{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:520px;}
-  .tr-team-card{background:var(--panel2);border:2px solid var(--border);border-radius:10px;padding:18px;text-align:center;display:flex;flex-direction:column;gap:9px;}
-  .tr-team-card.winner.t1{border-color:var(--blue);background:rgba(68,136,255,0.1);animation:winnerGlow1 1.5s ease-in-out infinite;}
-  .tr-team-card.winner.t2{border-color:var(--purple);background:rgba(170,68,255,0.1);animation:winnerGlow2 1.5s ease-in-out infinite;}
-  .tr-team-card.draw{border-color:var(--yellow);background:rgba(255,204,0,0.07);}
-  @keyframes winnerGlow1{0%,100%{box-shadow:0 0 12px rgba(68,136,255,0.3)}50%{box-shadow:0 0 30px rgba(68,136,255,0.6)}}
-  @keyframes winnerGlow2{0%,100%{box-shadow:0 0 12px rgba(170,68,255,0.3)}50%{box-shadow:0 0 30px rgba(170,68,255,0.6)}}
-  .tr-trophy{font-size:32px;}
-  .tr-name{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;}
-  .tr-name.t1{color:var(--blue);}
-  .tr-name.t2{color:var(--purple);}
-  .tr-score-big{font-family:'Orbitron',sans-serif;font-size:34px;font-weight:900;color:var(--text);}
-  .tr-detail{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);line-height:1.8;white-space:pre-line;}
-  .tr-winner-banner{font-family:'Orbitron',sans-serif;font-size:clamp(16px,5vw,28px);font-weight:900;text-align:center;letter-spacing:2px;padding:11px 22px;border-radius:8px;}
-  .tr-winner-banner.t1-win{color:var(--blue);background:rgba(68,136,255,0.1);border:1px solid rgba(68,136,255,0.3);text-shadow:0 0 20px rgba(68,136,255,0.5);}
-  .tr-winner-banner.t2-win{color:var(--purple);background:rgba(170,68,255,0.1);border:1px solid rgba(170,68,255,0.3);text-shadow:0 0 20px rgba(170,68,255,0.5);}
-  .tr-winner-banner.draw-win{color:var(--yellow);background:rgba(255,204,0,0.1);border:1px solid rgba(255,204,0,0.3);}
-
-  /* GAME OVER */
-  .gameover-screen{background:#000;position:fixed;inset:0;z-index:4000;display:none;flex-direction:column;align-items:center;justify-content:center;gap:13px;text-align:center;padding:28px;overflow:hidden;}
-  .gameover-screen.show{display:flex;}
-  .gameover-screen::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,0,0,0.06) 3px,rgba(255,0,0,0.06) 4px);pointer-events:none;}
-  .skulls-row{display:flex;gap:9px;font-size:32px;animation:skullShake 0.4s infinite;}
-  @keyframes skullShake{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
-  .go-title{font-family:'Orbitron',sans-serif;font-size:clamp(26px,10vw,64px);font-weight:900;color:var(--red);text-shadow:0 0 30px rgba(255,0,0,0.8),4px 4px 0 #000;letter-spacing:4px;animation:glitchText 0.15s infinite;line-height:1;}
-  @keyframes glitchText{0%,90%,100%{clip-path:none;transform:translate(0)}92%{clip-path:polygon(0 20%,100% 20%,100% 40%,0 40%);transform:translate(-3px,0);color:#0ff}94%{clip-path:polygon(0 60%,100% 60%,100% 80%,0 80%);transform:translate(3px,0);color:#f0f}96%{clip-path:none;transform:translate(0)}}
-  .go-sub{font-family:'Share Tech Mono',monospace;font-size:clamp(11px,3vw,14px);color:rgba(255,100,100,0.9);max-width:420px;line-height:1.7;letter-spacing:1px;}
-  .go-sub span{color:var(--red);font-weight:bold;}
-  .go-score{font-family:'Orbitron',sans-serif;font-size:11px;color:var(--muted);letter-spacing:3px;border:1px solid var(--red-dim);padding:7px 16px;border-radius:4px;}
-  .go-btn{background:var(--red);color:#fff;border:none;border-radius:6px;font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;padding:13px 26px;cursor:pointer;letter-spacing:2px;-webkit-appearance:none;touch-action:manipulation;min-height:44px;}
-  .go-btn:active{background:#ff4455;}
-  .go-btn-sec{background:transparent;color:var(--muted);border:1px solid var(--muted);border-radius:6px;font-family:'Orbitron',sans-serif;font-size:12px;padding:11px 20px;cursor:pointer;letter-spacing:2px;-webkit-appearance:none;touch-action:manipulation;min-height:44px;}
-  .go-btn-sec:active{color:var(--text);border-color:var(--text);}
-
-  /* WIN */
-  .win-screen{background:#000d06;position:fixed;inset:0;z-index:4000;display:none;flex-direction:column;align-items:center;justify-content:center;gap:13px;text-align:center;padding:28px;overflow:hidden;}
-  .win-screen.show{display:flex;}
-  .win-screen::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(0,255,136,0.08) 0%,transparent 70%);pointer-events:none;}
-  .win-particles{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
-  .win-particle{position:absolute;animation:riseUp linear infinite;pointer-events:none;}
-  @keyframes riseUp{0%{transform:translateY(110vh) rotate(0deg);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-60px) rotate(360deg);opacity:0}}
-  .win-icon{font-size:56px;animation:winPulse 1s ease-in-out infinite;}
-  @keyframes winPulse{0%,100%{transform:scale(1) rotate(-5deg)}50%{transform:scale(1.12) rotate(5deg)}}
-  .win-title{font-family:'Orbitron',sans-serif;font-size:clamp(17px,5vw,32px);font-weight:900;color:var(--green);text-shadow:0 0 25px rgba(0,255,136,0.6);letter-spacing:2px;line-height:1.2;}
-  .win-badge{background:rgba(0,255,136,0.07);border:2px solid var(--green);border-radius:12px;padding:13px 22px;max-width:480px;}
-  .win-badge-title{font-family:'Orbitron',sans-serif;font-size:11px;color:var(--cyan);letter-spacing:3px;margin-bottom:7px;}
-  .win-badge-text{font-size:16px;font-weight:700;color:#fff;line-height:1.5;}
-  .win-score-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
-  .win-stat{background:rgba(0,255,136,0.06);border:1px solid rgba(0,255,136,0.2);border-radius:8px;padding:9px 16px;text-align:center;}
-  .win-stat-num{font-family:'Orbitron',sans-serif;font-size:20px;color:var(--green);}
-  .win-stat-label{font-size:10px;color:var(--muted);margin-top:3px;letter-spacing:1px;}
-  .win-btn{background:var(--green);color:#000;border:none;border-radius:6px;font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;padding:13px 26px;cursor:pointer;letter-spacing:2px;-webkit-appearance:none;touch-action:manipulation;min-height:44px;}
-  .win-btn:active{background:#00ffaa;}
-
-  /* BLOCKER */
-  .blocker-screen{background:rgba(255,34,51,0.96);position:fixed;inset:0;z-index:5000;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:28px;animation:glitch 0.1s infinite;}
-  .blocker-screen.show{display:flex;}
-  @keyframes glitch{0%,94%,100%{transform:translate(0)}95%{transform:translate(-2px,1px)}96%{transform:translate(2px,-1px)}97%{transform:translate(-1px,2px)}}
-  .blocker-title{font-family:'Orbitron',sans-serif;font-size:clamp(24px,8vw,56px);font-weight:900;color:#fff;text-shadow:4px 4px 0 rgba(0,0,0,0.3);line-height:1;}
-  .blocker-sub{font-family:'Share Tech Mono',monospace;font-size:13px;color:rgba(255,255,255,0.85);max-width:380px;line-height:1.6;}
-  .blocker-btn{background:#fff;color:var(--red);border:none;border-radius:6px;font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;padding:13px 26px;cursor:pointer;letter-spacing:2px;-webkit-appearance:none;touch-action:manipulation;min-height:44px;}
-
-  .cat-ataque{color:#ff6b6b;}.cat-humano{color:var(--yellow);}.cat-tecno{color:var(--cyan);}.cat-proto{color:var(--green);}
-
-  @media (max-width: 520px) {
-    body{overflow-x:hidden;}
-    .container{padding:10px;min-height:100svh;}
-    .header{padding:10px 0 8px;}
-    .header-label{font-size:9px;letter-spacing:1.6px;line-height:1.45;max-width:100%;overflow-wrap:normal;}
-    .header h1{font-size:clamp(25px,9vw,34px);letter-spacing:1px;}
-    .header-sub{font-size:9px;letter-spacing:2px;line-height:1.5;}
-    .status-bar{display:grid;grid-template-columns:1fr 1fr;padding:9px 10px;font-size:11px;gap:8px;}
-    .stat{justify-content:center;min-width:0;}
-    .lives{min-width:52px;justify-content:center;}
-    .heart{font-size:14px;}
-    .toast{top:auto;bottom:calc(env(safe-area-inset-bottom, 0px) + 12px);max-width:calc(100vw - 32px);white-space:normal;text-align:center;line-height:1.35;padding:8px 14px;font-size:11px;transform:translateX(-50%) translateY(80px);}
-    .toast.show{transform:translateX(-50%) translateY(0);}
-    .quiz-area{gap:10px;}
-    .question-card{padding:14px;}
-    .q-meta{gap:8px;align-items:flex-start;}
-    .q-tag{letter-spacing:1px;line-height:1.35;}
-    .q-text{font-size:17px;line-height:1.45;}
-    .opt-btn{padding:12px 11px;font-size:15px;line-height:1.35;}
-    .explanation{font-size:13px;line-height:1.45;max-height:34svh;overflow-y:auto;}
-    .next-btn{align-self:stretch;text-align:center;}
-    .gameover-screen,.win-screen,.blocker-screen{justify-content:flex-start;overflow-y:auto;padding:calc(env(safe-area-inset-top, 0px) + 22px) 16px calc(env(safe-area-inset-bottom, 0px) + 22px);}
-    .gameover-screen{gap:10px;}
-    .skulls-row{font-size:28px;margin-top:8px;}
-    .go-title{font-size:clamp(32px,13vw,48px);letter-spacing:2px;line-height:1.05;}
-    .go-sub{font-size:12px;line-height:1.55;max-width:100%;}
-    .go-score{width:100%;font-size:10px;letter-spacing:2px;line-height:1.45;}
-    .gameover-screen .go-btn,.gameover-screen .go-btn-sec{flex:1 1 150px;font-size:12px;letter-spacing:1.5px;}
-    .win-badge{max-width:100%;}
-    .win-score-row{width:100%;}
-    .win-stat{flex:1 1 95px;}
-    .team-inputs,.tr-teams{grid-template-columns:1fr;}
-    .team-hud-card{align-items:flex-start;gap:6px;min-width:0;}
-    .th-name{font-size:10px;overflow-wrap:anywhere;}
-    .th-turn-badge{font-size:9px;}
-  }
-
-  @media (max-width: 360px) {
-    .header-label{font-size:8px;letter-spacing:1px;}
-    .status-bar{grid-template-columns:1fr;font-size:10px;}
-    .q-text{font-size:16px;}
-    .opt-btn{font-size:14px;}
-    .vf-grid{grid-template-columns:1fr;}
-    .go-title{font-size:34px;}
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Personal landing page for Nicolás I. Peña Henríquez, software engineer in Chile.">
+    <meta name="theme-color" content="#0b0f10">
+    <meta property="og:title" content="Nicolás I. Peña Henríquez">
+    <meta property="og:description" content="Software engineer focused on web, mobile, backend, AI tooling, and automation.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://irenko.cl/">
+    <title>Nicolás I. Peña Henríquez | Software Engineer</title>
+    <link rel="icon" href="./static/img/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500;600&family=Source+Sans+3:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="./static/styles.css?v=dark-simple">
 </head>
 <body>
-<div class="grid-bg"></div>
-<div class="toast" id="toast"></div>
+    <a class="skip-link" href="#main" data-es="Saltar al contenido" data-en="Skip to content">Skip to content</a>
 
-<!-- GAME OVER -->
-<div class="gameover-screen" id="gameoverScreen">
-  <div class="win-particles" id="skullParticles"></div>
-  <div class="skulls-row">💀☠️💀☠️💀</div>
-  <div class="go-title">HAS SIDO<br>HACKEADO</div>
-  <div class="go-sub">El hospital ha caído.<br>Todos los sistemas están <span>comprometidos</span>.<br>Las fichas clínicas fueron cifradas y los pacientes están en riesgo.<br><br><span>¡Estudia más y vuelve a intentarlo!</span></div>
-  <div class="go-score" id="goScore">PUNTAJE FINAL: 0</div>
-  <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;position:relative;z-index:10;">
-    <button class="go-btn" onclick="retryFromGameover()">↺ REINTENTAR</button>
-    <button class="go-btn-sec" onclick="homeFromAny()">⌂ INICIO</button>
-  </div>
-</div>
+    <header class="site-header">
+        <a class="brand" href="#home" aria-label="irenko.cl">
+            <span class="brand-mark">NP</span>
+            <span>irenko.cl</span>
+        </a>
 
-<!-- WIN -->
-<div class="win-screen" id="winScreen">
-  <div class="win-particles" id="winParticles"></div>
-  <div class="win-icon">🏆</div>
-  <div class="win-title">¡SISTEMA<br>RESTAURADO!</div>
-  <div class="win-badge">
-    <div class="win-badge-title">// CERTIFICADO DE COMPETENCIA</div>
-    <div class="win-badge-text">Eres un verdadero<br>Informático Biomédico 🩺💻</div>
-  </div>
-  <div class="win-score-row">
-    <div class="win-stat"><div class="win-stat-num" id="winScore">0</div><div class="win-stat-label">PUNTOS</div></div>
-    <div class="win-stat"><div class="win-stat-num" id="winCorrect">0/0</div><div class="win-stat-label">CORRECTAS</div></div>
-    <div class="win-stat"><div class="win-stat-num" id="winCombo">0</div><div class="win-stat-label">RACHA MÁX</div></div>
-  </div>
-  <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;position:relative;z-index:10;">
-    <button class="win-btn" onclick="retryFromWin()">↺ JUGAR DE NUEVO</button>
-    <button class="go-btn-sec" onclick="homeFromAny()">⌂ INICIO</button>
-  </div>
-</div>
+        <div class="header-controls">
+            <nav class="nav-links" aria-label="Main navigation">
+                <a href="#experience" data-es="Experiencia" data-en="Experience">Experience</a>
+                <a href="#projects" data-es="Proyectos" data-en="Projects">Projects</a>
+                <a href="#contact" data-es="Contacto" data-en="Contact">Contact</a>
+            </nav>
 
-<!-- TEAM TRANSITION -->
-<div class="team-transition" id="teamTransition">
-  <div class="tt-label">TURNO DE</div>
-  <div class="tt-team" id="ttTeamName">EQUIPO 1</div>
-  <div class="tt-sub" id="ttSub">Prepárense — se viene su ronda</div>
-  <div class="tt-score-prev" id="ttScorePrev"></div>
-  <button class="tt-btn" onclick="startTeamRound()">⚡ COMENZAR RONDA</button>
-</div>
+            <div class="language-toggle" aria-label="Language selector">
+                <button type="button" data-lang-button="es" aria-pressed="false">ES</button>
+                <button type="button" class="active" data-lang-button="en" aria-pressed="true">EN</button>
+            </div>
+        </div>
+    </header>
 
-<!-- BLOCKER -->
-<div class="blocker-screen" id="blockerScreen">
-  <div class="blocker-title">⚠ SISTEMA<br>BLOQUEADO</div>
-  <div style="font-size:40px">🔒</div>
-  <div class="blocker-sub">Todos tus archivos han sido <strong>cifrados</strong>.<br>Para recuperar acceso a las fichas clínicas, responde correctamente.<br><br><em>— Esto es lo que un ransomware hace a un hospital —</em></div>
-  <button class="blocker-btn" onclick="hideBlocker()">ENTIENDO EL PELIGRO</button>
-</div>
+    <main id="main">
+        <section class="hero" id="home">
+            <p class="eyebrow" data-es="Ingeniero de Software · Chile" data-en="Software Engineer · Chile">
+                Software Engineer · Chile
+            </p>
+            <h1>Nicolás I. Peña Henríquez</h1>
+            <p class="hero-lead"
+                data-es="Construyo aplicaciones web, móviles y backend con foco en producto, mantenibilidad y uso en producción. También diseño flujos asistidos por IA, automatizaciones y herramientas de desarrollo con Codex/OpenCode, skills y MCPs."
+                data-en="I build web, mobile, and backend applications with a focus on product, maintainability, and production use. I also design AI-assisted workflows, automation, and developer tooling with Codex/OpenCode, skills, and MCPs.">
+                I build web, mobile, and backend applications with a focus on product, maintainability, and production
+                use. I also design AI-assisted workflows, automation, and developer tooling with Codex/OpenCode,
+                skills, and MCPs.
+            </p>
 
-<div class="container">
-  <div class="header">
-    <div class="header-label">⬤ ALERTA SISTEMA ACTIVO — BIOINGENIERÍA DUOC UC</div>
-    <h1>CÓDIGO <span>ROJO</span></h1>
-    <div class="header-sub">CIBERSEGURIDAD EN SALUD // MODO ENTRENAMIENTO</div>
-    <div class="header-line"></div>
-  </div>
+            <div class="hero-meta" aria-label="Professional summary">
+                <span data-es="Globe · desde mayo 2025" data-en="Globe · since May 2025">Globe · since May 2025</span>
+                <span data-es="Ingeniero Civil en Computación · Universidad de Chile"
+                    data-en="Computer Science Engineer · University of Chile">Computer Science Engineer · University
+                    of Chile</span>
+                <span data-es="Laravel · Vue · Flutter" data-en="Laravel · Vue · Flutter">Laravel · Vue · Flutter</span>
+                <span data-es="Codex/OpenCode · MCPs · automatización"
+                    data-en="Codex/OpenCode · MCPs · automation">Codex/OpenCode · MCPs · automation</span>
+            </div>
 
-  <div class="status-bar" id="statusBar">
-    <div class="stat"><span class="stat-label">PTS</span><span class="stat-val" id="scoreDisplay">0</span></div>
-    <div class="stat"><span class="stat-label">VIDAS</span><div class="lives" id="livesDisplay"><span class="heart">❤️</span><span class="heart">❤️</span><span class="heart">❤️</span></div></div>
-    <div class="stat"><span class="stat-label">⏱</span><span class="stat-val timer-num" id="timerDisplay">--</span></div>
-    <div class="stat"><span class="stat-label">RACHA</span><span class="stat-val green" id="comboDisplay">0🔥</span></div>
-  </div>
+            <div class="hero-actions" aria-label="Primary actions">
+                <a class="button button-primary" href="https://github.com/Irenko85" target="_blank"
+                    rel="noreferrer">GitHub</a>
+                <a class="button"
+                    href="https://www.linkedin.com/in/nicol%C3%A1s-irenco-pe%C3%B1a-henr%C3%ADquez-a81980255/"
+                    target="_blank" rel="noreferrer">LinkedIn</a>
+            </div>
+        </section>
 
-  <div class="progress-wrap" id="progressWrap" style="display:none">
-    <div class="progress-fill" id="progressFill" style="width:0%"></div>
-  </div>
+        <section class="section" id="experience">
+            <div class="section-heading">
+                <p class="eyebrow" data-es="Experiencia" data-en="Experience">Experience</p>
+                <h2 data-es="Trabajo reciente" data-en="Recent work">Recent work</h2>
+            </div>
 
-  <div class="team-hud" id="teamHud">
-    <div class="team-hud-card" id="thCard1">
-      <div><div class="th-name t1" id="th1Name">EQUIPO 1</div><div class="th-detail" id="th1Detail">0 ✓ 0 ✗</div></div>
-      <div style="text-align:right"><div class="th-score" id="th1Score">0</div><div class="th-turn-badge" id="th1Badge">—</div></div>
-    </div>
-    <div class="team-hud-card" id="thCard2">
-      <div><div class="th-name t2" id="th2Name">EQUIPO 2</div><div class="th-detail" id="th2Detail">0 ✓ 0 ✗</div></div>
-      <div style="text-align:right"><div class="th-score" id="th2Score">0</div><div class="th-turn-badge" id="th2Badge">—</div></div>
-    </div>
-  </div>
+            <div class="list">
+                <article class="list-item">
+                    <div>
+                        <p class="item-date" data-es="Mayo 2025 · presente" data-en="May 2025 · present">
+                            May 2025 · present
+                        </p>
+                        <h3>Globe S.A. · <span data-es="Ingeniero de Software" data-en="Software Engineer">Software
+                                Engineer</span></h3>
+                    </div>
+                    <p data-es="Desarrollo de productos web y móviles, APIs y funcionalidades de negocio con Laravel, Vue y Flutter."
+                        data-en="Development of web and mobile products, APIs, and business features with Laravel, Vue, and Flutter.">
+                        Development of web and mobile products, APIs, and business features with Laravel, Vue, and
+                        Flutter.
+                    </p>
+                </article>
 
-  <!-- INTRO -->
-  <div class="screen active" id="screenIntro">
-    <div class="intro-card">
-      <div class="big-icon">🏥</div>
-      <div>
-        <div class="intro-title">INCIDENTE DE SEGURIDAD DETECTADO</div>
-        <p class="intro-desc">Un hospital perdió acceso a sus fichas clínicas por un ataque de ransomware. Tu misión: demostrar que conoces ciberseguridad para restablecer el sistema.</p>
-      </div>
-      <div class="intro-stats">
-        <div class="intro-stat"><div class="intro-stat-num">15</div><div class="intro-stat-label">PREGUNTAS</div></div>
-        <div class="intro-stat"><div class="intro-stat-num">4</div><div class="intro-stat-label">BLOQUES</div></div>
-        <div class="intro-stat"><div class="intro-stat-num">5</div><div class="intro-stat-label">MODOS</div></div>
-      </div>
-      <div style="font-weight:600;color:var(--muted);font-size:13px;">Elige el modo de juego:</div>
-      <div class="mode-grid">
-        <button class="mode-btn" onclick="startGame('normal')"><div class="mode-icon">⚡</div><div class="mode-name">NORMAL</div><div class="mode-desc">30s · 3 vidas</div></button>
-        <button class="mode-btn" onclick="startGame('presion')"><div class="mode-icon">🔥</div><div class="mode-name">BAJO PRESIÓN</div><div class="mode-desc">15s · Vida por timeout</div></button>
-        <button class="mode-btn" onclick="goTeamSetup()"><div class="mode-icon">⚔️</div><div class="mode-name">MODO EQUIPOS</div><div class="mode-desc">Turnos · Puntaje final</div></button>
-        <button class="mode-btn" onclick="startGame('vf')"><div class="mode-icon">✅</div><div class="mode-name">VERDADERO/FALSO</div><div class="mode-desc">15 afirmaciones difíciles</div></button>
-        <button class="mode-btn" onclick="showBlocker()"><div class="mode-icon">💻</div><div class="mode-name">DEMO RANSOMWARE</div><div class="mode-desc">Simulación de ataque</div></button>
-      </div>
-    </div>
-  </div>
+                <article class="list-item">
+                    <div>
+                        <p class="item-date" data-es="Julio 2024 · febrero 2025" data-en="July 2024 · February 2025">
+                            July 2024 · February 2025
+                        </p>
+                        <h3>NIC Chile · <span data-es="Backend Developer" data-en="Backend Developer">Backend Developer</span></h3>
+                    </div>
+                    <p data-es="Trabajo de título desarrollado con NIC Chile: sistema de sugerencia de dominios usando noticias, tendencias, extracción de palabras clave, Gemini e integración con servicios existentes."
+                        data-en="Final degree project developed with NIC Chile: domain suggestion system using news, trends, keyword extraction, Gemini, and integration with existing services.">
+                        Final degree project developed with NIC Chile: domain suggestion system using news, trends,
+                        keyword extraction, Gemini, and integration with existing services.
+                    </p>
+                </article>
 
-  <!-- TEAM SETUP -->
-  <div class="screen" id="screenTeamSetup">
-    <div class="team-setup-card">
-      <div class="team-setup-title">⚔️ CONFIGURAR MODO EQUIPOS</div>
-      <p style="color:var(--muted);font-size:13px;text-align:center;max-width:440px;">Cada equipo juega su ronda por separado. Al final se revela quién protegió mejor el hospital.</p>
-      <div class="team-inputs">
-        <div class="team-input-group"><label class="team1-label">// EQUIPO 1</label><input class="team-name-input" id="team1Input" placeholder="Ej: Los Hackers" maxlength="20"></div>
-        <div class="team-input-group"><label class="team2-label">// EQUIPO 2</label><input class="team-name-input" id="team2Input" placeholder="Ej: Los Defenders" maxlength="20"></div>
-      </div>
-      <div><div class="qs-select-label" style="text-align:center;margin-bottom:8px;">PREGUNTAS POR EQUIPO</div>
-      <div class="qs-select" id="qsSelect">
-        <button class="qs-btn" onclick="selectQCount(5,this)">5</button>
-        <button class="qs-btn active" onclick="selectQCount(8,this)">8</button>
-        <button class="qs-btn" onclick="selectQCount(15,this)">15</button>
-      </div></div>
-      <button class="start-team-btn" onclick="startTeamMode()">⚡ INICIAR PARTIDA</button>
-      <button class="go-btn-sec" onclick="goHome()">← VOLVER</button>
-    </div>
-  </div>
+                <article class="list-item">
+                    <div>
+                        <p class="item-date" data-es="Julio 2024 · diciembre 2024"
+                            data-en="July 2024 · December 2024">July 2024 · December 2024</p>
+                        <h3>Unholster · <span data-es="Fullstack Developer" data-en="Fullstack Developer">Fullstack
+                                Developer</span></h3>
+                    </div>
+                    <p data-es="Fullstack en el ramo Proyecto de Software, con Unholster como empresa contraparte: trabajo en MyUnholster y su flujo de feedback con evaluación asistida por IA."
+                        data-en="Fullstack work for the Software Project course, with Unholster as partner company: MyUnholster and its AI-assisted feedback evaluation flow.">
+                        Fullstack work for the Software Project course, with Unholster as partner company: MyUnholster
+                        and its AI-assisted feedback evaluation flow.
+                    </p>
+                </article>
 
-  <!-- QUIZ -->
-  <div class="screen" id="screenQuiz">
-    <div class="quiz-area">
-      <div class="question-card normal-card" id="questionCard">
-        <div class="q-meta"><span class="q-tag" id="qCategory">BLOQUE 1</span><span class="q-num" id="qNum">1/15</span></div>
-        <div class="q-text" id="qText">Cargando...</div>
-        <div class="timer-bar-wrap"><div class="timer-bar" id="timerBar" style="width:100%"></div></div>
-      </div>
-      <div id="optionsContainer"></div>
-      <div class="explanation" id="explanation"><div class="exp-label" id="expLabel">// DATO CLAVE</div><span id="expText"></span></div>
-      <div class="combo-display" id="comboMsg"></div>
-      <button class="next-btn" id="nextBtn">SIGUIENTE →</button>
-    </div>
-  </div>
+                <article class="list-item">
+                    <div>
+                        <p class="item-date" data-es="Diciembre 2023 · marzo 2024"
+                            data-en="December 2023 · March 2024">December 2023 · March 2024</p>
+                        <h3>Utopie · <span data-es="Fullstack Developer" data-en="Fullstack Developer">Fullstack
+                                Developer</span></h3>
+                    </div>
+                    <p data-es="Segunda práctica profesional: desarrollo de funcionalidades educativas con IA y generación dinámica de presentaciones."
+                        data-en="Second professional internship: development of educational AI features and dynamic presentation generation.">
+                        Second professional internship: development of educational AI features and dynamic presentation
+                        generation.
+                    </p>
+                </article>
 
-  <!-- RESULTS -->
-  <div class="screen" id="screenResults">
-    <div class="results-card">
-      <div class="score-circle"><div class="score-num" id="finalScore">0</div><div class="score-total">puntos</div></div>
-      <div class="result-title" id="resultTitle">—</div>
-      <div class="result-msg" id="resultMsg"></div>
-      <div class="breakdown">
-        <div class="break-item"><div class="break-num" style="color:var(--green)" id="correctCount">0</div><div class="break-label">CORRECTAS</div></div>
-        <div class="break-item"><div class="break-num" style="color:var(--red)" id="wrongCount">0</div><div class="break-label">INCORRECTAS</div></div>
-        <div class="break-item"><div class="break-num" style="color:var(--yellow)" id="maxCombo">0</div><div class="break-label">MAX RACHA</div></div>
-      </div>
-      <div class="btn-row">
-        <button class="btn-primary" onclick="restartGame()">↺ REINICIAR</button>
-        <button class="btn-secondary" onclick="goHome()">⌂ INICIO</button>
-      </div>
-    </div>
-  </div>
+                <article class="list-item">
+                    <div>
+                        <p class="item-date" data-es="Abril 2023 · julio 2025" data-en="April 2023 · July 2025">
+                            April 2023 · July 2025
+                        </p>
+                        <h3 data-es="Universidad de Chile · Ayudante" data-en="University of Chile · Teaching Assistant">
+                            University of Chile · Teaching Assistant
+                        </h3>
+                    </div>
+                    <p data-es="Ayudantía del curso de Desarrollo Web en el DCC, revisando tareas y ejercicios."
+                        data-en="Teaching assistant for the Web Development course at DCC, reviewing assignments and exercises.">
+                        Teaching assistant for the Web Development course at DCC, reviewing assignments and exercises.
+                    </p>
+                </article>
+            </div>
+        </section>
 
-  <!-- TEAM RESULTS -->
-  <div class="screen" id="screenTeamResults">
-    <div class="team-results-card">
-      <div class="tr-title">🏁 RESULTADOS FINALES</div>
-      <div class="tr-winner-banner" id="trWinnerBanner">—</div>
-      <div class="tr-teams">
-        <div class="tr-team-card" id="trCard1"><div class="tr-trophy" id="trTrophy1">🤝</div><div class="tr-name t1" id="trName1">EQUIPO 1</div><div class="tr-score-big" id="trScore1">0</div><div class="tr-detail" id="trDetail1"></div></div>
-        <div class="tr-team-card" id="trCard2"><div class="tr-trophy" id="trTrophy2">🤝</div><div class="tr-name t2" id="trName2">EQUIPO 2</div><div class="tr-score-big" id="trScore2">0</div><div class="tr-detail" id="trDetail2"></div></div>
-      </div>
-      <div class="btn-row">
-        <button class="btn-primary" onclick="restartTeam()">↺ REVANCHA</button>
-        <button class="btn-secondary" onclick="goHome()">⌂ INICIO</button>
-      </div>
-    </div>
-  </div>
-</div>
+        <section class="section" id="projects">
+            <div class="section-heading">
+                <p class="eyebrow" data-es="Proyectos" data-en="Projects">Projects</p>
+                <h2 data-es="Proyectos" data-en="Projects">
+                    Projects
+                </h2>
+            </div>
 
-<script>
-// ========== PREGUNTAS OPCIÓN MÚLTIPLE ==========
-// correct: índice de la respuesta correcta ANTES del shuffle (0-3 distribuido variado)
-// Todas las opciones tienen longitud similar para que no se pueda adivinar por tamaño
-const MC_QUESTIONS = [
-  { block:"BLOQUE 1: EL ATAQUE", blockClass:"cat-ataque",
-    text:"Un atacante lleva 6 meses dentro de la red extrayendo fichas en silencio sin activar alarmas. ¿Qué tipo de amenaza es?",
-    options:[
-      "APT: intrusión larga y silenciosa para robar datos sin ser detectado",
-      "Ransomware de baja intensidad que cifra gradualmente los archivos",
-      "DDoS diferido que colapsa el sistema al acumularse suficientes peticiones",
-      "Error de firewall que abre acceso accidental a usuarios externos"
-    ], correct:0,
-    explanation:"Una APT (Advanced Persistent Threat) es lo opuesto al ransomware: no hace ruido. El atacante estudia la red, se mueve lateralmente y extrae datos durante meses sin cifrar ni destruir nada, porque su objetivo es el espionaje prolongado, no el rescate." },
+            <div class="project-list">
+                <article class="project-item">
+                    <div>
+                        <p class="item-date">Vue · Supabase · Capacitor</p>
+                        <h3>Love Notes</h3>
+                    </div>
+                    <p data-es="App personal de tareas compartidas con sincronización en tiempo real, notificaciones push para móvil y plugin/MCP para automatizar tareas desde Codex."
+                        data-en="Personal app for shared tasks with real-time sync, mobile push notifications, and a plugin/MCP to automate tasks from Codex.">
+                        Personal app for shared tasks with real-time sync, mobile push notifications, and a plugin/MCP
+                        to automate tasks from Codex.
+                    </p>
+                </article>
 
-  { block:"BLOQUE 1: EL ATAQUE", blockClass:"cat-ataque",
-    text:"Un PDF del 'MINSAL' se abre sin novedad. Tres días después el ransomware se activa solo. ¿Qué explica el retraso?",
-    options:[
-      "El antivirus tardó 3 días en procesar el archivo antes de ejecutarlo",
-      "Un error de sincronización del servidor de correo que demoró la entrega",
-      "Payload diferido: el malware se instala y espera orden remota para activarse",
-      "El sistema operativo puso el archivo en cuarentena y se liberó solo"
-    ], correct:2,
-    explanation:"El phishing con payload diferido instala el malware silenciosamente y espera, a veces días, la orden del atacante. La demora entre el clic y el ataque hace muy difícil vincular el correo como causa del incidente." },
+                <article class="project-item">
+                    <div>
+                        <p class="item-date">Python · Discord · Telegram</p>
+                        <h3>WCA Competition Notifier</h3>
+                    </div>
+                    <p data-es="Automatización que monitorea competencias WCA en Chile y notifica torneos nuevos, registros y cupos limitados."
+                        data-en="Automation that monitors WCA competitions in Chile and notifies new events, registration windows, and limited spots.">
+                        Automation that monitors WCA competitions in Chile and notifies new events, registration windows,
+                        and limited spots.
+                    </p>
+                    <a class="text-link" href="https://github.com/Irenko85/wca-dc-webhook" target="_blank"
+                        rel="noreferrer" data-es="Ver repo" data-en="View repo">View repo</a>
+                </article>
 
-  { block:"BLOQUE 1: EL ATAQUE", blockClass:"cat-ataque",
-    text:"¿Por qué un historial clínico se vende hasta 200 veces más caro que una tarjeta de crédito en el mercado negro?",
-    options:[
-      "Porque los bancos reembolsan el fraude pero los médicos no cubren filtraciones",
-      "Porque contiene datos permanentes que permiten extorsión, fraude de seguros y suplantación médica sin posibilidad de cancelarlos",
-      "Porque las plataformas digitales ilegales cobran menos comisión por datos médicos",
-      "Porque la ley chilena no sanciona la compraventa de datos clínicos entre privados"
-    ], correct:1,
-    explanation:"Una tarjeta se bloquea en minutos. Un diagnóstico de VIH, historial psiquiátrico o cirugía estética no caduca jamás. Se usa para extorsión, negar empleos, fraude a aseguradoras y venta a farmacéuticas. Vale hasta USD $1.000 versus ~$5 de una tarjeta." },
+                <article class="project-item">
+                    <div>
+                        <p class="item-date">Python · Docker · Discord</p>
+                        <h3>SSJ Bot</h3>
+                    </div>
+                    <p data-es="Bot de música para Discord con slash commands, colas, búsqueda, yt-dlp, ffmpeg y despliegue Docker."
+                        data-en="Discord music bot with slash commands, queues, search, yt-dlp, ffmpeg, and Docker deployment.">
+                        Discord music bot with slash commands, queues, search, yt-dlp, ffmpeg, and Docker deployment.
+                    </p>
+                    <a class="text-link" href="https://github.com/Irenko85/ssj-bot" target="_blank" rel="noreferrer"
+                        data-es="Ver repo" data-en="View repo">View repo</a>
+                </article>
+            </div>
+        </section>
 
-  { block:"BLOQUE 1: EL ATAQUE", blockClass:"cat-ataque",
-    text:"El hospital segmenta la red: imagenología en VLAN A, fichas clínicas en VLAN B. ¿Qué ventaja concreta ofrece esto ante un ransomware que entra por imagenología?",
-    options:[
-      "Permite detectar el ransomware antes de que cifre cualquier archivo",
-      "Duplica los datos en ambas VLANs como respaldo automático en tiempo real",
-      "Elimina por completo la posibilidad de que el ransomware cifre algo",
-      "Contiene el malware en VLAN A e impide que alcance las fichas clínicas de VLAN B"
-    ], correct:3,
-    explanation:"La segmentación no evita la infección inicial pero limita el movimiento lateral. Sin ella, un clic en urgencias puede paralizar radiología, laboratorio y administración simultáneamente. Con segmentación, el daño queda aislado al segmento infectado." },
+        <section class="section contact-section" id="contact">
+            <div>
+                <p class="eyebrow" data-es="Contacto" data-en="Contact">Contact</p>
+                <h2 data-es="Más contexto profesional y código en GitHub y LinkedIn."
+                    data-en="More professional context and code on GitHub and LinkedIn.">
+                    More professional context and code on GitHub and LinkedIn.
+                </h2>
+            </div>
+            <div class="contact-actions">
+                <a class="button button-primary" href="https://github.com/Irenko85" target="_blank"
+                    rel="noreferrer">GitHub</a>
+                <a class="button"
+                    href="https://www.linkedin.com/in/nicol%C3%A1s-irenco-pe%C3%B1a-henr%C3%ADquez-a81980255/"
+                    target="_blank" rel="noreferrer">LinkedIn</a>
+            </div>
+        </section>
+    </main>
 
-  { block:"BLOQUE 1: EL ATAQUE", blockClass:"cat-ataque",
-    text:"Llaman al hospital diciendo ser soporte técnico del proveedor clínico y piden acceso remoto urgente para un parche. ¿Qué técnica podría ser?",
-    options:[
-      "Fuerza bruta disfrazada de solicitud de soporte para evitar alertas del sistema",
-      "SQL Injection ejecutado a través de la línea telefónica sobre el sistema ERP",
-      "Vishing: ingeniería social por teléfono para obtener acceso sin explotar vulnerabilidades técnicas",
-      "DDoS encubierto donde la llamada distrae mientras se satura el servidor"
-    ], correct:2,
-    explanation:"El vishing (voice phishing) no necesita explotar ningún sistema: convence a una persona de entregar acceso voluntariamente. Es especialmente efectivo en hospitales donde el personal está entrenado para responder rápido ante 'urgencias técnicas'." },
+    <footer class="site-footer">
+        <span>irenko.cl</span>
+    </footer>
 
-  { block:"BLOQUE 2: FACTOR HUMANO", blockClass:"cat-humano",
-    text:"Una médica usa la misma clave en el sistema clínico y en una app de delivery que fue hackeada. ¿Cuál es el riesgo concreto para el hospital?",
-    options:[
-      "Ninguno real: los sistemas son técnicamente independientes entre sí",
-      "Solo si la médica usa el mismo dispositivo físico para ambas aplicaciones",
-      "El hospital lo detecta fácilmente porque el intento vendría de una IP sospechosa",
-      "Credential stuffing: bots prueban las claves filtradas del delivery en el sistema hospitalario"
-    ], correct:3,
-    explanation:"El credential stuffing es automatizado: millones de pares usuario/contraseña filtrados se prueban en todos los servicios posibles. Si la clave es la misma, los atacantes entran al sistema clínico sin hackear nada del hospital. El 65% de las personas reutiliza contraseñas." },
+    <script>
+        const languageStorageKey = "landing-language-v2";
+        const languageButtons = document.querySelectorAll("[data-lang-button]");
+        const translatableNodes = document.querySelectorAll("[data-es][data-en]");
 
-  { block:"BLOQUE 2: FACTOR HUMANO", blockClass:"cat-humano",
-    text:"Un técnico encuentra una USB en el estacionamiento etiquetada 'Resultados Privados' y la conecta para identificar al dueño. ¿Qué ataque ejecutó sin saberlo?",
-    options:[
-      "USB Drop: el dispositivo instala malware automáticamente al conectarse a cualquier equipo",
-      "Nada grave: el antivirus corporativo escanea todo USB antes de montarlo en el sistema",
-      "Solo hay riesgo si abrió manualmente algún archivo ejecutable del dispositivo",
-      "Ataque válido solo en equipos con Windows XP sin soporte, no en sistemas actuales"
-    ], correct:0,
-    explanation:"El USB Drop es un vector físico clásico. El malware puede ejecutarse antes de que aparezca cualquier archivo en pantalla mediante autorun o exploits de icono. En pruebas de seguridad, el 45-60% de las USB 'perdidas' son conectadas voluntariamente por empleados." },
+        function setLanguage(lang) {
+            const safeLang = lang === "en" ? "en" : "es";
+            document.documentElement.lang = safeLang;
+            document.body.dataset.lang = safeLang;
+            localStorage.setItem(languageStorageKey, safeLang);
 
-  { block:"BLOQUE 2: FACTOR HUMANO", blockClass:"cat-humano",
-    text:"El ransomware entró usando la cuenta de un empleado despedido hace 3 meses cuyo acceso jamás fue revocado. ¿Qué falla de proceso es esta?",
-    options:[
-      "Fallo del firewall al no detectar logins de cuentas inactivas por más de 30 días",
-      "Ausencia de protocolo de offboarding: las credenciales no se desactivaron al término del contrato",
-      "Violación directa de la Ley 19.628 por parte del ex-empleado al usar claves ajenas",
-      "Fallo del sistema de backups que no registró correctamente los accesos históricos"
-    ], correct:1,
-    explanation:"Las cuentas huérfanas de ex-empleados son una brecha crítica y frecuente. Un offboarding robusto debe revocar todos los accesos el mismo día de la desvinculación, sin excepciones, incluyendo VPN, correo y sistemas clínicos." },
+            translatableNodes.forEach((node) => {
+                node.textContent = node.dataset[safeLang];
+            });
 
-  { block:"BLOQUE 2: FACTOR HUMANO", blockClass:"cat-humano",
-    text:"Con la política de cambio de clave cada 30 días, los funcionarios empezaron a escribirlas en post-its pegados al monitor. ¿Qué principio de seguridad ilustra esto?",
-    options:[
-      "Que el personal necesita sanción disciplinaria por incumplir las normas de seguridad",
-      "Que el área de TI debe implementar un gestor de contraseñas para resolver el problema técnico",
-      "Fricción de seguridad: reglas demasiado restrictivas generan atajos que reducen la seguridad real",
-      "Que la política de 30 días es correcta pero debe combinarse con mayor vigilancia física"
-    ], correct:2,
-    explanation:"NIST (2020) recomienda no forzar cambios frecuentes de contraseña: generan 'Enero2024!', 'Febrero2024!' o post-its. La seguridad usable es más efectiva que la seguridad perfecta en papel. Mejor: contraseñas largas y memorables + MFA." },
-
-  { block:"BLOQUE 3: DEFENSAS TECNOLÓGICAS", blockClass:"cat-tecno",
-    text:"El atacante ya está dentro de la red (entró por phishing). El firewall perimetral no lo detecta. ¿Qué herramienta monitorea el tráfico interno?",
-    options:[
-      "Aumentar la frecuencia de backups para reducir la ventana de exposición de datos",
-      "Agregar un segundo firewall perimetral más potente en paralelo al existente",
-      "Cambiar todas las contraseñas del hospital de manera masiva e inmediata",
-      "IDS/IPS: detecta patrones anómalos internos como movimiento lateral o cifrado masivo"
-    ], correct:3,
-    explanation:"El firewall perimetral protege la frontera. Si el atacante ya está adentro, el IDS/IPS analiza el tráfico interno: si un equipo de urgencias intenta acceder a 500 carpetas en 2 minutos (patrón de ransomware), lo detecta y puede bloquearlo automáticamente." },
-
-  { block:"BLOQUE 3: DEFENSAS TECNOLÓGICAS", blockClass:"cat-tecno",
-    text:"El técnico de mantención solo puede ver registros de calibración, no fichas clínicas. Si su cuenta es comprometida, ¿qué protege este diseño?",
-    options:[
-      "Principio de mínimo privilegio: el atacante solo accede a lo que el usuario legítimamente necesita",
-      "Reduce la carga del servidor al limitar la cantidad de consultas que puede realizar cada cuenta",
-      "Garantiza que el técnico no pueda cometer fraude interno con datos de pacientes",
-      "El sistema de calibración tiene cifrado más robusto que el de fichas clínicas"
-    ], correct:0,
-    explanation:"El principio de mínimo privilegio (PoLP) acota el daño máximo posible por cuenta comprometida. Si cada rol solo accede a lo necesario, el ransomware que entra por mantención no puede cifrar fichas clínicas ni moverse hacia datos más sensibles." },
-
-  { block:"BLOQUE 3: DEFENSAS TECNOLÓGICAS", blockClass:"cat-tecno",
-    text:"El servidor tiene cifrado en reposo en todas las fichas. El ransomware obtiene acceso con credenciales de un médico. ¿El cifrado en reposo lo detiene?",
-    options:[
-      "Sí, porque ningún proceso externo puede cifrar datos que ya están cifrados en disco",
-      "No: el ransomware opera con los permisos del SO que puede leer y volver a cifrar los datos con su propia clave",
-      "Sí, pero solo si el algoritmo usado es AES-256 o superior en modo CBC",
-      "No, salvo que la clave de cifrado esté gestionada por un HSM externo desconectado"
-    ], correct:1,
-    explanation:"El cifrado en reposo protege contra robo físico del disco. Pero el ransomware opera dentro del SO con permisos de usuario legítimo: descifra los archivos, los lee y los vuelve a cifrar con su clave. No detiene el ransomware, aunque sí protege contra otros vectores." },
-
-  { block:"BLOQUE 4: PLAN DE ACCIÓN", blockClass:"cat-proto",
-    text:"Son las 2 AM. Se detecta cifrado masivo en el servidor de fichas. ¿Cuál es el orden correcto de las primeras acciones?",
-    options:[
-      "Pagar el rescate de inmediato, luego restaurar y después investigar el origen",
-      "Apagar todos los servidores juntos para detener el cifrado y esperar a TI en la mañana",
-      "Aislar los sistemas afectados, activar contingencia manual, notificar al equipo IRP y no pagar",
-      "Llamar al proveedor del antivirus para que resuelva el incidente de forma remota"
-    ], correct:2,
-    explanation:"(1) Aislar detiene la propagación lateral. (2) Activar contingencia manual mantiene el hospital operativo. (3) Notificar al equipo IRP. (4) Nunca pagar como primera acción. Apagar sin aislar primero puede destruir evidencia forense y empeorar la restauración." },
-
-  { block:"BLOQUE 4: PLAN DE ACCIÓN", blockClass:"cat-proto",
-    text:"El pentest entró al sistema clínico en 4 horas usando solo phishing e ingeniería social, sin explotar vulnerabilidades técnicas. ¿Qué conclusión es correcta?",
-    options:[
-      "El pentest fue inválido por usar métodos no técnicos fuera del alcance contratado",
-      "El hospital requiere un firewall de nueva generación con inspección SSL activada",
-      "El vector principal de ataque es humano: la inversión en tecnología no compensa la falta de capacitación",
-      "El sistema clínico tiene vulnerabilidades críticas de software sin parchear que facilitaron la entrada"
-    ], correct:2,
-    explanation:"Si se entra 100% por ingeniería social sin tocar código, el hospital puede tener la mejor tecnología del mundo y seguir siendo vulnerable. La capacitación continua del personal es la única defensa real contra este vector." },
-
-  { block:"BLOQUE 4: PLAN DE ACCIÓN", blockClass:"cat-proto",
-    text:"¿Cuál estrategia de backup cumple la regla 3-2-1 y resiste mejor un ransomware que cifra también unidades de red conectadas?",
-    options:[
-      "Backup diario completo en servidor externo conectado permanentemente a la red interna",
-      "Backup en la misma máquina del servidor con snapshot horario del sistema de archivos",
-      "Backup incremental diario en servidor externo más copia semanal completa en cinta offline",
-      "Replicación en tiempo real a un segundo servidor dentro del mismo datacenter hospitalario"
-    ], correct:2,
-    explanation:"La regla 3-2-1: 3 copias, 2 medios distintos, 1 offline. El servidor externo conectado permanentemente puede ser cifrado junto con el resto. La cinta offline es físicamente inalcanzable para el malware porque no está en la red." }
-];
-
-// ========== PREGUNTAS VERDADERO/FALSO ==========
-const VF_QUESTIONS = [
-  { block:"BLOQUE 1: EL ATAQUE", blockClass:"cat-ataque",
-    text:"Un hospital con todas sus actualizaciones de software al día está completamente protegido contra ransomware.",
-    correct:false, explanation:"FALSO. Los exploits de día cero (zero-day) son vulnerabilidades desconocidas para el fabricante, sin parche disponible. Además, el vector más común de entrada no es una vulnerabilidad técnica sino phishing o ingeniería social, que no se corrige con actualizaciones. Las actualizaciones son necesarias pero insuficientes." },
-
-  { block:"BLOQUE 1: EL ATAQUE", blockClass:"cat-ataque",
-    text:"En un ataque de doble extorsión, el atacante cifra los datos Y amenaza con publicarlos si no se paga el rescate, incluso si el hospital tiene backups perfectos.",
-    correct:true, explanation:"VERDADERO. La doble extorsión surgió alrededor de 2020 cuando los hospitales empezaron a tener buenos backups. Los atacantes evolucionaron: primero exfiltran los datos, luego los cifran. Aunque restaures desde backup, aún tienen los datos originales y pueden publicarlos o venderlos. Los backups ya no son suficiente defensa por sí solos." },
-
-  { block:"BLOQUE 1: EL ATAQUE", blockClass:"cat-ataque",
-    text:"Un ataque DDoS a un hospital puede tener consecuencias mortales aunque no robe ni destruya ningún dato.",
-    correct:true, explanation:"VERDADERO. Si el DDoS colapsa el sistema de gestión de camas, el sistema de alerta de pacientes críticos o la telemedicina de urgencias, puede retrasar decisiones médicas fatales. En 2020, un DDoS a un hospital alemán obligó a desviar ambulancias; una paciente murió en el trayecto a un hospital alternativo." },
-
-  { block:"BLOQUE 1: EL ATAQUE", blockClass:"cat-ataque",
-    text:"Si el hospital paga el rescate de un ransomware, es garantía de recuperar todos los datos cifrados en buen estado.",
-    correct:false, explanation:"FALSO. El Departamento de Justicia de EE.UU. reporta que el 42% de los que pagan no recuperan todos sus datos. Además: el descifrador puede ser defectuoso, los datos pueden estar corruptos, y los atacantes a veces piden pagos adicionales. Pagar también posiciona al hospital como objetivo futuro (saben que paga)." },
-
-  { block:"BLOQUE 2: FACTOR HUMANO", blockClass:"cat-humano",
-    text:"Una contraseña de 20 caracteres con solo letras minúsculas como 'correctocaballo bateríagrapa' es más segura que una de 8 caracteres como 'P@$$w0rd'.",
-    correct:true, explanation:"VERDADERO. La entropía de una contraseña depende principalmente de su longitud. 'P@$$w0rd' es corta y sigue patrones predecibles que los diccionarios de ataque conocen. Una frase larga de palabras aleatorias tiene exponencialmente más combinaciones posibles. NIST recomienda priorizar longitud sobre complejidad artificial." },
-
-  { block:"BLOQUE 2: FACTOR HUMANO", blockClass:"cat-humano",
-    text:"El principio de mínimo privilegio significa que todos los funcionarios del hospital deben tener el mismo nivel de acceso para no discriminar roles.",
-    correct:false, explanation:"FALSO. Es exactamente lo contrario: cada usuario debe tener únicamente los permisos mínimos necesarios para realizar su trabajo. Un auxiliar no necesita acceso a fichas clínicas; un médico general no necesita acceso a registros de psiquiatría. Esto limita el daño posible si cualquier cuenta es comprometida." },
-
-  { block:"BLOQUE 2: FACTOR HUMANO", blockClass:"cat-humano",
-    text:"El shadow IT (uso de software o servicios no autorizados por el área de TI) representa un riesgo de seguridad para el hospital.",
-    correct:true, explanation:"VERDADERO. Cuando un médico usa su Dropbox personal para compartir fichas o instala un software no aprobado, el hospital pierde control sobre dónde están sus datos y bajo qué estándares de seguridad. El shadow IT crea vectores de ataque que el equipo de TI desconoce y no puede proteger." },
-
-  { block:"BLOQUE 2: FACTOR HUMANO", blockClass:"cat-humano",
-    text:"Si el hospital activa MFA (autenticación multifactor), las contraseñas débiles o filtradas dejan de ser un riesgo de seguridad.",
-    correct:false, explanation:"FALSO. La MFA reduce drásticamente el riesgo, pero no lo elimina. Existen ataques de MFA fatigue (bombardeo de solicitudes de aprobación hasta que el usuario acepta por cansancio), SIM swapping (clonar la SIM para recibir los SMS), y malware de tipo infostealer que roba tanto contraseñas como tokens activos de sesión." },
-
-  { block:"BLOQUE 3: DEFENSAS TECNOLÓGICAS", blockClass:"cat-tecno",
-    text:"Un firewall de nueva generación (NGFW) puede analizar el contenido cifrado del tráfico HTTPS para detectar malware sin necesidad de descifrar ese tráfico.",
-    correct:false, explanation:"FALSO. Para inspeccionar tráfico HTTPS cifrado, el firewall debe realizar SSL inspection (descifrar, analizar, volver a cifrar). Sin esto, el NGFW solo ve metadatos del tráfico cifrado, no su contenido. Muchos ataques modernos usan HTTPS precisamente para evadir firewalls que no realizan inspección SSL." },
-
-  { block:"BLOQUE 3: DEFENSAS TECNOLÓGICAS", blockClass:"cat-tecno",
-    text:"El cifrado de extremo a extremo de las comunicaciones internas del hospital protege los datos si un atacante ya tiene acceso físico a los servidores.",
-    correct:false, explanation:"FALSO. El cifrado de extremo a extremo protege los datos en tránsito entre puntos. Si el atacante tiene acceso físico o de sistema operativo al servidor, puede acceder a los datos cuando están en uso (en memoria RAM o antes de ser cifrados para envío). Para datos en reposo se necesita cifrado de almacenamiento, no de tránsito." },
-
-  { block:"BLOQUE 3: DEFENSAS TECNOLÓGICAS", blockClass:"cat-tecno",
-    text:"Un SIEM (Security Information and Event Management) permite al hospital correlacionar eventos de múltiples sistemas para detectar ataques que serían invisibles analizando cada sistema por separado.",
-    correct:true, explanation:"VERDADERO. Un login fallido en el sistema de fichas a las 3 AM es poco relevante solo. Un login fallido + una conexión a un servidor externo desconocido + descarga masiva de archivos en la misma hora, analizados juntos por un SIEM, revelan un ataque coordinado. La correlación de eventos es fundamental para detectar APTs y movimiento lateral." },
-
-  { block:"BLOQUE 3: DEFENSAS TECNOLÓGICAS", blockClass:"cat-tecno",
-    text:"Los dispositivos médicos conectados (marcapasos monitoreados remotamente, bombas de infusión en red, ventiladores IoT) pueden ser vectores de entrada para ciberataques al hospital.",
-    correct:true, explanation:"VERDADERO. El IoT médico es una superficie de ataque crítica y frecuentemente ignorada. Muchos dispositivos médicos usan sistemas operativos desactualizados (Windows XP embebido), no pueden actualizarse sin recertificación, y sus fabricantes no priorizaron seguridad. En 2015, investigadores demostraron control remoto de bombas de insulina. La FDA ha emitido alertas sobre vulnerabilidades en marcapasos y bombas de infusión." },
-
-  { block:"BLOQUE 4: PLAN DE ACCIÓN", blockClass:"cat-proto",
-    text:"El plan de continuidad del negocio (BCP) de un hospital solo debe activarse cuando los sistemas digitales fallen completamente.",
-    correct:false, explanation:"FALSO. El BCP debe activarse preventivamente ante indicios de ataque, no solo tras la caída total. Si se detectan señales tempranas de ransomware (cifrado inusual, comportamiento anómalo), activar los protocolos manuales mientras aún hay tiempo evita que el hospital quede completamente paralizado. La respuesta tardía multiplica el daño." },
-
-  { block:"BLOQUE 4: PLAN DE ACCIÓN", blockClass:"cat-proto",
-    text:"Después de restaurar los sistemas tras un ataque de ransomware, el hospital debe considerar que el vector de entrada (la vulnerabilidad original) sigue activo hasta que se identifique y corrija.",
-    correct:true, explanation:"VERDADERO. Restaurar desde backup vuelve los datos a un estado anterior, pero NO elimina la puerta por la que entró el atacante. Si fue phishing, el empleado sigue siendo vulnerable. Si fue una credencial comprometida, esa credencial sigue activa. Restaurar sin cerrar el vector de entrada casi garantiza una reinfección, a veces en horas." },
-
-  { block:"BLOQUE 4: PLAN DE ACCIÓN", blockClass:"cat-proto",
-    text:"La norma ISO 27001 requiere que el hospital certifique su seguridad una sola vez, y esa certificación es permanente.",
-    correct:false, explanation:"FALSO. ISO 27001 requiere auditorías de vigilancia anuales y recertificación completa cada 3 años. Además, obliga a un proceso de mejora continua: identificar nuevos riesgos, actualizar controles, revisar políticas. Una certificación 'congelada' en el tiempo pierde validez ante amenazas emergentes. El estándar es un ciclo, no un punto de llegada." }
-];
-
-// ========== STATE ==========
-let state = {
-  mode:'normal', questions:[], currentIdx:0,
-  score:0, lives:3, combo:0, maxCombo:0, correct:0, wrong:0,
-  timerInterval:null, timeLeft:30, answered:false, shuffledCorrect:0,
-  teamQCount:8,
-  teams:[
-    {name:'EQUIPO 1',score:0,correct:0,wrong:0,maxCombo:0},
-    {name:'EQUIPO 2',score:0,correct:0,wrong:0,maxCombo:0}
-  ],
-  currentTeam:0, teamPhase:0
-};
-
-// ========== SCREENS ==========
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-function goHome(){
-  clearInterval(state.timerInterval);
-  hideAllOverlays();
-  document.getElementById('progressWrap').style.display='none';
-  document.getElementById('teamHud').classList.remove('show');
-  document.getElementById('statusBar').style.display='';
-  resetHearts();
-  showScreen('screenIntro');
-}
-function hideAllOverlays(){
-  ['gameoverScreen','winScreen','teamTransition','blockerScreen'].forEach(id=>{
-    document.getElementById(id).classList.remove('show');
-  });
-}
-
-// ========== GAME START ==========
-function startGame(mode){
-  state.mode=mode;
-  const pool = mode==='vf' ? [...VF_QUESTIONS] : [...MC_QUESTIONS];
-  state.questions = pool.sort(()=>Math.random()-0.5);
-  state.currentIdx=0; state.score=0; state.lives=3;
-  state.combo=0; state.maxCombo=0; state.correct=0; state.wrong=0;
-  document.getElementById('teamHud').classList.remove('show');
-  document.getElementById('statusBar').style.display='';
-  resetHearts();
-  document.getElementById('progressWrap').style.display='block';
-  updateStatusBar();
-  showScreen('screenQuiz');
-  loadQuestion();
-}
-
-// ========== TEAM MODE ==========
-function goTeamSetup(){showScreen('screenTeamSetup');}
-let teamQCount=8;
-function selectQCount(n,btn){
-  teamQCount=n;
-  document.querySelectorAll('.qs-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-}
-function startTeamMode(){
-  const n1=document.getElementById('team1Input').value.trim()||'EQUIPO 1';
-  const n2=document.getElementById('team2Input').value.trim()||'EQUIPO 2';
-  state.teams=[
-    {name:n1.toUpperCase(),score:0,correct:0,wrong:0,maxCombo:0},
-    {name:n2.toUpperCase(),score:0,correct:0,wrong:0,maxCombo:0}
-  ];
-  state.teamQCount=teamQCount;
-  state.teamPhase=0; state.currentTeam=0;
-  document.getElementById('th1Name').textContent=state.teams[0].name;
-  document.getElementById('th2Name').textContent=state.teams[1].name;
-  document.getElementById('trName1').textContent=state.teams[0].name;
-  document.getElementById('trName2').textContent=state.teams[1].name;
-  showTeamTransition(0,true);
-}
-function showTeamTransition(teamIdx,isFirst){
-  const t=state.teams[teamIdx], other=state.teams[1-teamIdx];
-  const trans=document.getElementById('teamTransition');
-  document.getElementById('ttTeamName').textContent=t.name;
-  document.getElementById('ttTeamName').className='tt-team '+(teamIdx===0?'t1':'t2');
-  trans.className='team-transition show '+(teamIdx===0?'team1-bg':'team2-bg');
-  document.getElementById('ttSub').textContent=isFirst?'¡Es su turno! Prepárense para proteger el hospital.':'El primer equipo terminó. Ahora es su turno.';
-  const prev=document.getElementById('ttScorePrev');
-  if(isFirst){prev.style.display='none';}
-  else{prev.style.display='block';prev.textContent=`${other.name}: ${other.score} pts · ${other.correct} correctas`;}
-}
-function startTeamRound(){
-  document.getElementById('teamTransition').classList.remove('show');
-  state.currentTeam=state.teamPhase;
-  state.questions=[...MC_QUESTIONS].sort(()=>Math.random()-0.5).slice(0,state.teamQCount);
-  state.currentIdx=0; state.score=0; state.lives=3;
-  state.combo=0; state.maxCombo=0; state.correct=0; state.wrong=0; state.answered=false;
-  state.mode='equipo';
-  resetHearts();
-  document.getElementById('statusBar').style.display='none';
-  document.getElementById('teamHud').classList.add('show');
-  document.getElementById('progressWrap').style.display='block';
-  updateTeamHud();
-  showScreen('screenQuiz');
-  loadQuestion();
-}
-function updateTeamHud(){
-  for(let i=0;i<2;i++){
-    const t=state.teams[i];
-    const active=i===state.currentTeam;
-    document.getElementById(`th${i+1}Score`).textContent=t.score;
-    document.getElementById(`th${i+1}Detail`).textContent=`${t.correct} ✓  ${t.wrong} ✗`;
-    document.getElementById(`thCard${i+1}`).className='team-hud-card'+(active?` active-team t${i+1}`:'');
-    document.getElementById(`th${i+1}Badge`).className='th-turn-badge'+(active?' active':' waiting');
-    document.getElementById(`th${i+1}Badge`).textContent=active?'▶ JUGANDO':'EN ESPERA';
-  }
-}
-function finishTeamRound(){
-  const t=state.teams[state.currentTeam];
-  t.score=state.score; t.correct=state.correct; t.wrong=state.wrong; t.maxCombo=state.maxCombo;
-  if(state.teamPhase===0){state.teamPhase=1;showTeamTransition(1,false);}
-  else{showTeamFinalResults();}
-}
-function showTeamFinalResults(){
-  clearInterval(state.timerInterval);
-  document.getElementById('progressWrap').style.display='none';
-  document.getElementById('teamHud').classList.remove('show');
-  hideAllOverlays();
-  const t1=state.teams[0],t2=state.teams[1];
-  document.getElementById('trScore1').textContent=t1.score;
-  document.getElementById('trScore2').textContent=t2.score;
-  document.getElementById('trDetail1').textContent=`${t1.correct} correctas · ${t1.wrong} incorrectas\nRacha máx: ${t1.maxCombo}`;
-  document.getElementById('trDetail2').textContent=`${t2.correct} correctas · ${t2.wrong} incorrectas\nRacha máx: ${t2.maxCombo}`;
-  const banner=document.getElementById('trWinnerBanner');
-  const c1=document.getElementById('trCard1'),c2=document.getElementById('trCard2');
-  c1.className='tr-team-card'; c2.className='tr-team-card';
-  document.getElementById('trTrophy1').textContent='🤝';
-  document.getElementById('trTrophy2').textContent='🤝';
-  if(t1.score>t2.score){
-    banner.className='tr-winner-banner t1-win';
-    banner.textContent=`🏆 ¡${t1.name} GANA!`;
-    c1.className='tr-team-card winner t1';
-    document.getElementById('trTrophy1').textContent='🏆';
-    document.getElementById('trTrophy2').textContent='😔';
-    spawnParticles('winParticles',['🏆','⭐','🎉','🛡️','💙'],20);
-  } else if(t2.score>t1.score){
-    banner.className='tr-winner-banner t2-win';
-    banner.textContent=`🏆 ¡${t2.name} GANA!`;
-    c2.className='tr-team-card winner t2';
-    document.getElementById('trTrophy2').textContent='🏆';
-    document.getElementById('trTrophy1').textContent='😔';
-    spawnParticles('winParticles',['🏆','⭐','🎉','🛡️','💜'],20);
-  } else {
-    banner.className='tr-winner-banner draw-win';
-    banner.textContent='🤝 ¡EMPATE ÉPICO!';
-    c1.className='tr-team-card draw'; c2.className='tr-team-card draw';
-  }
-  showScreen('screenTeamResults');
-}
-function restartTeam(){
-  state.teams.forEach(t=>{t.score=0;t.correct=0;t.wrong=0;t.maxCombo=0;});
-  state.teamPhase=0;
-  showTeamTransition(0,true);
-}
-
-// iOS Safari fix: touchend fires before click and prevents the 300ms delay ghost-tap issue
-// Also handles cases where click is swallowed by WebKit's touch event model
-function addTapHandler(el, fn) {
-  let ignoreClickUntil = 0;
-  el.addEventListener('touchend', (e) => {
-    e.preventDefault(); // prevent ghost click
-    ignoreClickUntil = Date.now() + 700;
-    fn();
-  }, { passive: false });
-  el.addEventListener('click', () => {
-    if (Date.now() < ignoreClickUntil) return; // already handled by touchend
-    fn();
-  });
-}
-
-// ========== LOAD QUESTION ==========
-function loadQuestion(){
-  const q=state.questions[state.currentIdx];
-  state.answered=false;
-  const isTeam=state.mode==='equipo', isVF=state.mode==='vf';
-
-  document.getElementById('qText').textContent=q.text;
-  document.getElementById('qNum').textContent=`${state.currentIdx+1}/${state.questions.length}`;
-
-  const tagClass=isTeam?(state.currentTeam===0?'q-tag t1-tag':'q-tag t2-tag'):(isVF?'q-tag vf-tag':'q-tag '+q.blockClass);
-  document.getElementById('qCategory').className=tagClass;
-  document.getElementById('qCategory').textContent=q.block;
-  document.getElementById('progressFill').style.width=`${(state.currentIdx/state.questions.length)*100}%`;
-
-  const cardClass=isTeam?(state.currentTeam===0?'t1-card':'t2-card'):(isVF?'vf-card':'normal-card');
-  document.getElementById('questionCard').className=`question-card ${cardClass}`;
-
-  // Build options
-  const container=document.getElementById('optionsContainer');
-  container.innerHTML='';
-
-  if(isVF){
-    const grid=document.createElement('div');
-    grid.className='vf-grid';
-    const tBtn=document.createElement('button');
-    tBtn.className='vf-btn vf-true';
-    tBtn.innerHTML='<div class="vf-icon">✅</div><div class="vf-label">VERDADERO</div>';
-    tBtn.type='button';
-    addTapHandler(tBtn, ()=>selectVF(true));
-    const fBtn=document.createElement('button');
-    fBtn.className='vf-btn vf-false';
-    fBtn.innerHTML='<div class="vf-icon">❌</div><div class="vf-label">FALSO</div>';
-    fBtn.type='button';
-    addTapHandler(fBtn, ()=>selectVF(false));
-    grid.appendChild(tBtn); grid.appendChild(fBtn);
-    container.appendChild(grid);
-  } else {
-    // Shuffle options, track where correct landed
-    const correctText=q.options[q.correct];
-    const shuffled=[...q.options].sort(()=>Math.random()-0.5);
-    state.shuffledCorrect=shuffled.indexOf(correctText);
-    const grid=document.createElement('div');
-    grid.className='options-grid';
-    const letters=['A','B','C','D'];
-    shuffled.forEach((opt,i)=>{
-      const btn=document.createElement('button');
-      btn.className='opt-btn';
-      btn.type='button';
-      btn.innerHTML=`<span class="opt-letter">${letters[i]}</span><span style="flex:1">${opt}</span>`;
-      addTapHandler(btn, ()=>selectAnswer(i));
-      grid.appendChild(btn);
-    });
-    container.appendChild(grid);
-  }
-
-  document.getElementById('explanation').className='explanation';
-  document.getElementById('explanation').style.display='none';
-  document.getElementById('nextBtn').className='next-btn';
-  document.getElementById('comboMsg').textContent='';
-
-  // Timer
-  clearInterval(state.timerInterval);
-  if(state.mode!=='equipo'){
-    const maxTime=state.mode==='presion'?15:30;
-    state.timeLeft=maxTime;
-    updateTimerBar(maxTime,maxTime);
-    state.timerInterval=setInterval(()=>{
-      state.timeLeft--;
-      updateTimerBar(state.timeLeft,maxTime);
-      if(state.timeLeft<=0){
-        clearInterval(state.timerInterval);
-        if(!state.answered){
-          if(state.mode==='presion') loseLife();
-          if(isVF) selectVF(null); else selectAnswer(-1);
+            languageButtons.forEach((button) => {
+                const isActive = button.dataset.langButton === safeLang;
+                button.classList.toggle("active", isActive);
+                button.setAttribute("aria-pressed", String(isActive));
+            });
         }
-      }
-    },1000);
-  } else {
-    document.getElementById('timerDisplay').textContent='∞';
-    document.getElementById('timerBar').style.width='100%';
-    updateTeamHud();
-  }
-  // No opacity animation — causes iOS Safari to block touch events on freshly rendered buttons
-  document.getElementById('questionCard').style.opacity='1';
-  document.getElementById('questionCard').style.transition='none';
-}
 
-function updateTimerBar(current,max){
-  const pct=(current/max)*100;
-  document.getElementById('timerBar').style.width=pct+'%';
-  document.getElementById('timerBar').className='timer-bar'+(current<=5?' urgent':'');
-  document.getElementById('timerDisplay').textContent=current+'s';
-  document.getElementById('timerDisplay').className='timer-num'+(current<=5?' urgent':'');
-}
+        languageButtons.forEach((button) => {
+            button.addEventListener("click", () => setLanguage(button.dataset.langButton));
+        });
 
-// ========== ANSWERING ==========
-function selectAnswer(chosen){
-  if(state.answered) return;
-  state.answered=true;
-  clearInterval(state.timerInterval);
-  const correctIdx=state.shuffledCorrect;
-  const buttons=document.querySelectorAll('.opt-btn');
-  if(!buttons.length) { processResult(false, state.questions[state.currentIdx].explanation); return; }
-  buttons.forEach(b=>b.disabled=true);
-  const isCorrect = chosen>=0 && chosen===correctIdx;
-  if(chosen>=0 && buttons[chosen]) buttons[chosen].classList.add(isCorrect?'correct':'wrong');
-  if(buttons[correctIdx]) buttons[correctIdx].classList.add('correct');
-  processResult(isCorrect, state.questions[state.currentIdx].explanation);
-}
-
-function selectVF(chosen){
-  if(state.answered) return;
-  state.answered=true;
-  clearInterval(state.timerInterval);
-  const q=state.questions[state.currentIdx];
-  const btns=document.querySelectorAll('.vf-btn');
-  btns.forEach(b=>b.disabled=true);
-  const isCorrect=chosen===q.correct;
-  btns.forEach(b=>{
-    const isTrue=b.classList.contains('vf-true');
-    if(isTrue===q.correct) b.classList.add('correct');
-    else if(chosen!==null) b.classList.add('wrong');
-  });
-  processResult(isCorrect,q.explanation);
-}
-
-function processResult(isCorrect,explanation){
-  const isTeam=state.mode==='equipo';
-  const exp=document.getElementById('explanation');
-  exp.style.display='block';
-  document.getElementById('expText').textContent=explanation;
-
-  if(isCorrect){
-    state.combo++; state.correct++;
-    if(state.combo>state.maxCombo) state.maxCombo=state.combo;
-    const bonusCombo=state.combo>=3?Math.floor(state.combo/3)*50:0;
-    const pts=100+bonusCombo+((!isTeam&&state.timeLeft)?state.timeLeft*2:0);
-    state.score+=pts;
-    if(isTeam){state.teams[state.currentTeam].score=state.score;state.teams[state.currentTeam].correct=state.correct;updateTeamHud();}
-    exp.className='explanation show';
-    document.getElementById('expLabel').textContent='✅ CORRECTO — DATO CLAVE';
-    if(state.combo>=3) document.getElementById('comboMsg').textContent=`🔥 RACHA x${state.combo} — +${bonusCombo} BONUS`;
-    showToast(`+${pts} pts${state.combo>=3?' 🔥':''}`,false);
-    updateStatusBar();
-    document.getElementById('nextBtn').className='next-btn show';
-  } else {
-    state.combo=0; state.wrong++;
-    if(!isTeam) loseLife();
-    else{state.teams[state.currentTeam].wrong=state.wrong;updateTeamHud();}
-    exp.className='explanation wrong-exp show';
-    document.getElementById('expLabel').textContent='❌ INCORRECTO — REVISA ESTO';
-    showToast('Respuesta incorrecta',true);
-    updateStatusBar();
-    if(state.lives<=0&&!isTeam){
-      setTimeout(()=>showGameOver(),1600);
-    } else {
-      document.getElementById('nextBtn').className='next-btn show';
-    }
-  }
-}
-
-function nextQuestion(){
-  if(!state.answered) return;
-  if(state.lives<=0&&state.mode!=='equipo'){showGameOver();return;}
-  state.currentIdx++;
-  if(state.currentIdx>=state.questions.length){
-    if(state.mode==='equipo') finishTeamRound();
-    else showWinOrResults();
-  } else loadQuestion();
-}
-
-// ========== LIVES ==========
-function loseLife(){
-  state.lives=Math.max(0,state.lives-1);
-  document.querySelectorAll('.heart').forEach((h,i)=>{
-    if(i>=state.lives){h.classList.add('dead');h.textContent='🖤';}
-  });
-}
-function resetHearts(){
-  document.querySelectorAll('.heart').forEach(h=>{h.classList.remove('dead');h.textContent='❤️';});
-}
-
-// ========== RESULTS ==========
-function showGameOver(){
-  clearInterval(state.timerInterval);
-  document.getElementById('progressWrap').style.display='none';
-  document.getElementById('goScore').textContent=`PUNTAJE: ${state.score} pts — ${state.correct}/${state.questions.length} correctas`;
-  spawnParticles('skullParticles',['💀','☠️','🔓','⚠️','👾'],18);
-  document.getElementById('gameoverScreen').classList.add('show');
-}
-function showWinOrResults(){
-  clearInterval(state.timerInterval);
-  document.getElementById('progressWrap').style.display='none';
-  const pct=Math.round((state.correct/state.questions.length)*100);
-  if(pct>=60){
-    document.getElementById('winScore').textContent=state.score;
-    document.getElementById('winCorrect').textContent=`${state.correct}/${state.questions.length}`;
-    document.getElementById('winCombo').textContent=state.maxCombo;
-    spawnParticles('winParticles',['🏥','💉','🩺','✅','⭐','🛡️','💻'],22);
-    document.getElementById('winScreen').classList.add('show');
-  } else {
-    document.getElementById('goScore').textContent=`PUNTAJE: ${state.score} pts — Solo ${state.correct}/${state.questions.length} correctas`;
-    spawnParticles('skullParticles',['💀','☠️','📉','❌','🔓'],18);
-    document.getElementById('gameoverScreen').classList.add('show');
-  }
-}
-function updateStatusBar(){
-  document.getElementById('scoreDisplay').textContent=state.score;
-  document.getElementById('comboDisplay').textContent=state.combo+'🔥';
-}
-
-// ========== PARTICLES ==========
-function spawnParticles(containerId,emojis,count){
-  const container=document.getElementById(containerId);
-  container.innerHTML='';
-  for(let i=0;i<count;i++){
-    const el=document.createElement('div');
-    el.className='win-particle';
-    el.textContent=emojis[Math.floor(Math.random()*emojis.length)];
-    el.style.left=Math.random()*100+'vw';
-    el.style.animationDuration=(3+Math.random()*5)+'s';
-    el.style.animationDelay=(Math.random()*3)+'s';
-    el.style.fontSize=(13+Math.random()*16)+'px';
-    container.appendChild(el);
-  }
-}
-
-// ========== TOAST ==========
-function showToast(msg,isWrong){
-  const t=document.getElementById('toast');
-  t.textContent=msg;
-  t.className='toast'+(isWrong?' wrong-toast':'')+' show';
-  setTimeout(()=>t.classList.remove('show'),2000);
-}
-
-// ========== MISC ==========
-function retryFromGameover(){document.getElementById('gameoverScreen').classList.remove('show');startGame(state.mode);}
-function retryFromWin(){document.getElementById('winScreen').classList.remove('show');startGame(state.mode);}
-function homeFromAny(){hideAllOverlays();goHome();}
-function restartGame(){hideAllOverlays();startGame(state.mode);}
-function showBlocker(){document.getElementById('blockerScreen').classList.add('show');}
-function hideBlocker(){document.getElementById('blockerScreen').classList.remove('show');}
-
-// Wire nextBtn with tap handler for iOS
-(function(){
-  const nb = document.getElementById('nextBtn');
-  addTapHandler(nb, ()=>nextQuestion());
-})();
-</script>
+        setLanguage(localStorage.getItem(languageStorageKey) || "en");
+    </script>
 </body>
+
 </html>
